@@ -520,6 +520,7 @@ function totals(){ let sum=0,count=0; for(const k in cart){ sum += byCode[k].pri
 /* ---------- Render catalog ---------- */
 const catalogEl = document.getElementById("catalog");
 const jumpEl = document.getElementById("jump");
+const controls = {};
 CATALOG.forEach(([cat,items],ci) => {
   const secId = "cat"+ci;
   const sec = document.createElement("section");
@@ -559,7 +560,6 @@ function makeControl(code){
   }
   wrap._draw = draw; draw(); controls[code]=wrap; return wrap;
 }
-const controls = {};
 
 function changeQty(code, delta){
   const q = (cart[code]||0) + delta;
