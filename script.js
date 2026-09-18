@@ -8,6 +8,8 @@
    3) MIN_ORDER       : minimum order value in rupees.
    ===================================================================== */
    const WHATSAPP_NUMBER = "919345273268";   // <<< PUT YOUR REAL NUMBER HERE
+   const CALL_NUMBER     = "6374439080";     // shown on Contact Us, digits only
+   const INSTAGRAM_URL   = "";               // paste your Instagram profile link
    const SHOP_NAME       = "Thala Crackers";
    const MIN_ORDER       = 3000;
 /* ===================================================================== */
@@ -256,7 +258,9 @@ const CATALOG = [
     ["267","50 - Item Gift Box","5 Box",3900],["268","60 - Item Gift Box","5 Box",4800],
   ]],
   ["Combo Packs", [
-    ["269","3000 Combo Pack","35 products",3000],["270","5K Combo Pack + Free Gift","52 items",5000],
+    ["270","5K Combo Pack","52 items • Free TN delivery",5000],
+    ["271","7.5K Combo Pack","70 items • Free TN delivery",7500],
+    ["272","10K Combo Pack","90 items • Free TN delivery",10000],
   ]],
 ];
 
@@ -276,7 +280,12 @@ function totals(){ let sum=0,count=0; for(const k in cart){ sum += byCode[k].pri
 /* ---------- Render catalog ---------- */
 const catalogEl = document.getElementById("catalog");
 const catListEl = document.getElementById("catList");
+const catGridEl = document.getElementById("catGrid");
+const productMount = document.getElementById("productMount");
+const browseView = document.getElementById("browseView");
+const productsView = document.getElementById("productsView");
 const controls = {};
+const sectionById = {};
 const CATEGORY_ICONS = {
   "Sparklers":"✨","Special Colourful Sparklers 2025":"✨","Flower Pots":"🎇","Multi Colour Flower Pots":"🎇",
   "Chakkars (Ground)":"🌀","Plastic Chakkar SPL 2025":"🌀","Twinkling Star":"⭐","One Sound Crackers":"💥",
@@ -295,62 +304,171 @@ const CATEGORY_ICONS = {
   "Balaji Brand SPL New Fancy":"🦸","Gift Boxes":"🎁","Combo Packs":"📦"
 };
 
-const PHOTO_BANNER_AFTER = { 4: {msg:"Light up every corner", sub:"Explore our full Diwali collection"}, 14: {msg:"Sivakasi's finest, delivered to you", sub:"Free delivery across Tamil Nadu"} };
-
 CATALOG.forEach(([cat,items],ci) => {
-  const isCombos = cat === "Gift Boxes" || cat === "Combo Packs";
-  const secId = isCombos && cat === "Gift Boxes" ? "combos" : "cat"+ci;
+  const secId = cat === "Combo Packs" ? "combos" : "cat"+ci;
   const icon = CATEGORY_ICONS[cat] || "🎆";
   const sec = document.createElement("section");
-  sec.className = "cat reveal"; sec.id = secId; sec.dataset.cat = cat.toLowerCase();
-  if(cat === "Combo Packs") sec.setAttribute("data-combo", "1");
+  sec.className = "cat"; sec.id = secId; sec.dataset.cat = cat.toLowerCase();
+  sec.hidden = true;
   sec.innerHTML = `<h2><span class="title-text">${icon} ${cat}</span> <span class="count">(${items.length})</span></h2><div class="bar"></div><div class="grid"></div>`;
   const gridEl = sec.querySelector(".grid");
   items.forEach((it, idx) => {
     const [code,name,pack,price] = it;
-    const mrp = Math.round(price * 4 * 100) / 100;
+    const isCombo = cat === "Combo Packs";
+    const mrp = isCombo ? null : Math.round(price * 4 * 100) / 100;
     const card = document.createElement("div");
     card.className = "card reveal-card"; card.dataset.code = code; card.dataset.search = (name+" "+cat).toLowerCase();
-    card.style.transitionDelay = ((idx % 8) * 55) + "ms";
+    card.style.transitionDelay = (Math.min(idx, 12) * 55) + "ms";
     card.innerHTML = `
       <div class="glare"></div>
       <div class="card-inner">
         <div class="tile">${icon}</div>
         <div class="name">${name}</div>
         <div class="sub">${pack}</div>
-        <div class="pricerow"><span class="mrp">${rupee(mrp)}</span><span class="price">${rupee(price)}</span></div>
+        <div class="pricerow">${mrp ? `<span class="mrp">${rupee(mrp)}</span>` : ""}<span class="price">${rupee(price)}</span></div>
         <div class="ctrl"></div>
       </div>`;
     card.querySelector(".ctrl").appendChild(makeControl(code));
     attachTilt(card);
     gridEl.appendChild(card);
   });
-  catalogEl.appendChild(sec);
+  productMount.appendChild(sec);
+  sectionById[secId] = sec;
 
-  if(PHOTO_BANNER_AFTER[ci]){
-    const {msg,sub} = PHOTO_BANNER_AFTER[ci];
-    const banner = document.createElement("div");
-    banner.className = "photobanner reveal";
-    banner.innerHTML = `<div><div class="msg">${msg}</div><div class="sub">${sub}</div></div>`;
-    catalogEl.appendChild(banner);
-  }
+  const tile = document.createElement("button");
+  tile.type = "button"; tile.className = "cat-tile";
+  tile.dataset.cat = cat.toLowerCase();
+  tile.dataset.id = secId;
+  tile.innerHTML = `<span class="ico">${icon}</span><span class="nm">${cat}</span><span class="ct">${items.length} item${items.length===1?"":"s"} →</span>`;
+  tile.onclick = () => openCategory(secId);
+  catGridEl.appendChild(tile);
 
   const item = document.createElement("button");
   item.type = "button"; item.className = "cat-item";
   item.textContent = icon+" "+cat;
   item.dataset.cat = cat.toLowerCase();
-  item.onclick = () => {
-    document.getElementById(secId).scrollIntoView({behavior:"smooth"});
-    closeMenus();
-  };
+  item.onclick = () => openCategory(secId);
   catListEl.appendChild(item);
 });
+const allItem = document.createElement("button");
+allItem.type = "button"; allItem.className = "cat-item";
+allItem.textContent = "← All categories";
+allItem.onclick = ()=>{ showBrowse({restore:true, scrollToShop:true}); closeMenus(); };
+catListEl.prepend(allItem);
 
-/* ---------- Scroll reveal ---------- */
+/* ---------- Category / product views ---------- */
+let lastBrowseScrollY = 0;
+let lastOpenedTile = null;
+
+function navOffset(){
+  const nav = document.querySelector(".navbar");
+  return (nav ? nav.getBoundingClientRect().height : 64) + 8;
+}
+
+function scrollInstant(fn){
+  const html = document.documentElement;
+  const prev = html.style.scrollBehavior;
+  html.style.scrollBehavior = "auto";
+  fn();
+  html.style.scrollBehavior = prev;
+}
+
+function playCardEntrance(sec){
+  const cards = [...sec.querySelectorAll(".card")];
+  cards.forEach((card,i)=>{
+    card.classList.remove("reveal-visible");
+    card.style.transitionDelay = (Math.min(i, 12) * 55) + "ms";
+  });
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      cards.forEach(card=> card.classList.add("reveal-visible"));
+    });
+  });
+}
+
+function animateCategoryTiles(){
+  document.querySelectorAll(".cat-tile").forEach((tile,i)=>{
+    tile.classList.remove("in");
+    tile.style.transitionDelay = (Math.min(i, 16) * 45) + "ms";
+  });
+  requestAnimationFrame(()=>{
+    document.querySelectorAll(".cat-tile").forEach(tile=>{
+      const r = tile.getBoundingClientRect();
+      if(r.top < window.innerHeight && r.bottom > 0) tile.classList.add("in");
+    });
+  });
+}
+
+function showTilesReady(){
+  document.querySelectorAll(".cat-tile").forEach(tile=>{
+    tile.classList.add("in");
+    tile.style.transitionDelay = "0ms";
+    tile.classList.toggle("was-open", tile === lastOpenedTile);
+  });
+}
+
+function setCategoryMode(on){
+  document.body.classList.toggle("in-category", on);
+}
+
+function showBrowse(opts = {}){
+  setCategoryMode(false);
+  const restore = !!opts.restore && lastBrowseScrollY > 0;
+  browseView.hidden = false;
+  productsView.hidden = true;
+  Object.values(sectionById).forEach(sec=> sec.hidden = true);
+  const q = document.getElementById("productSearch");
+  if(q) q.value = "";
+  if(restore){
+    showTilesReady();
+    scrollInstant(()=>{
+      window.scrollTo(0, lastBrowseScrollY);
+      if(lastOpenedTile){
+        const r = lastOpenedTile.getBoundingClientRect();
+        if(r.bottom < navOffset() || r.top > window.innerHeight){
+          window.scrollTo(0, Math.max(0, window.scrollY + r.top - navOffset()));
+        }
+      }
+    });
+  } else {
+    document.querySelectorAll(".cat-tile.was-open").forEach(t=> t.classList.remove("was-open"));
+    animateCategoryTiles();
+    if(opts.scrollToShop){
+      document.getElementById("shop").scrollIntoView({behavior:"smooth"});
+    }
+  }
+}
+
+function openCategory(secId){
+  const sec = sectionById[secId];
+  if(!sec) return;
+  const tile = document.querySelector(`.cat-tile[data-id="${secId}"]`);
+  const wasBrowsing = !browseView.hidden;
+  if(wasBrowsing){
+    lastBrowseScrollY = window.scrollY;
+    lastOpenedTile = tile;
+  }
+  setCategoryMode(true);
+  browseView.hidden = true;
+  productsView.hidden = false;
+  Object.values(sectionById).forEach(s=> s.hidden = s !== sec);
+  sec.querySelectorAll(".card").forEach(c=> c.style.display = "");
+  if(productSearch) productSearch.value = "";
+  playCardEntrance(sec);
+  const toolbar = document.querySelector(".products-toolbar");
+  scrollInstant(()=>{
+    const delta = toolbar.getBoundingClientRect().top - navOffset();
+    if(Math.abs(delta) > 2) window.scrollBy(0, delta);
+  });
+  closeMenus();
+}
+
+/* ---------- Scroll reveal (page sections + category tiles) ---------- */
 function revealIfInViewport(el){
   const r = el.getBoundingClientRect();
   if(r.top < window.innerHeight * 0.92 && r.bottom > 0){
     el.classList.add("reveal-visible");
+    if(el.classList.contains("cat-tile") || el.closest(".cat-grid")) el.classList.add("in");
     return true;
   }
   return false;
@@ -361,11 +479,12 @@ if("IntersectionObserver" in window){
     entries.forEach(entry=>{
       if(entry.isIntersecting){
         entry.target.classList.add("reveal-visible");
+        if(entry.target.classList.contains("cat-tile")) entry.target.classList.add("in");
         revealObserver.unobserve(entry.target);
       }
     });
-  }, {threshold:0.12, rootMargin:"0px 0px -8% 0px"});
-  document.querySelectorAll(".reveal, .reveal-card").forEach(el=> revealObserver.observe(el));
+  }, {threshold:0.08, rootMargin:"0px 0px -4% 0px"});
+  document.querySelectorAll(".reveal, .cat-tile").forEach(el=> revealObserver.observe(el));
 
   let revealCheckQueued = false;
   function queueRevealCheck(){
@@ -373,7 +492,7 @@ if("IntersectionObserver" in window){
     revealCheckQueued = true;
     requestAnimationFrame(()=>{
       revealCheckQueued = false;
-      document.querySelectorAll(".reveal:not(.reveal-visible), .reveal-card:not(.reveal-visible)").forEach(el=>{
+      document.querySelectorAll(".reveal:not(.reveal-visible), .cat-tile:not(.in)").forEach(el=>{
         if(revealIfInViewport(el)) revealObserver.unobserve(el);
       });
     });
@@ -382,7 +501,9 @@ if("IntersectionObserver" in window){
   window.addEventListener("resize", queueRevealCheck);
   queueRevealCheck();
 } else {
-  document.querySelectorAll(".reveal, .reveal-card").forEach(el=> el.classList.add("reveal-visible"));
+  document.querySelectorAll(".reveal, .cat-tile").forEach(el=>{
+    el.classList.add("reveal-visible","in");
+  });
 }
 
 function attachTilt(card){
@@ -436,6 +557,7 @@ function refreshBar(){
   const {sum,count} = totals();
   barCount.textContent = count; barTotal.textContent = rupee(sum);
   cartbar.classList.toggle("show", count>0);
+  document.body.classList.toggle("has-cart", count>0);
 }
 
 /* ---------- Overlay / cart ---------- */
@@ -446,10 +568,29 @@ document.getElementById("closeCart").onclick = closeCart;
 overlay.addEventListener("click", e=>{ if(e.target===overlay) closeCart(); });
 function closeCart(){ overlay.classList.remove("show"); }
 
+function clearCart(){
+  const rows = [...cartItemsEl.querySelectorAll(".crow")];
+  rows.forEach((row,i)=>{
+    row.classList.add("leaving");
+    row.style.animationDelay = (i * 40) + "ms";
+  });
+  const finish = ()=>{
+    Object.keys(cart).forEach(code=> delete cart[code]);
+    saveCart();
+    Object.keys(controls).forEach(code=> controls[code] && controls[code]._draw());
+    refreshBar();
+    renderCart();
+  };
+  if(rows.length) setTimeout(finish, 260 + Math.min(rows.length, 8) * 40);
+  else finish();
+}
+
 const cartItemsEl = document.getElementById("cartItems");
 const totalsBox = document.getElementById("totalsBox");
 function renderCart(){
   const keys = Object.keys(cart);
+  const clearBtn = document.getElementById("clearCart");
+  if(clearBtn) clearBtn.hidden = keys.length===0;
   if(keys.length===0){
     cartItemsEl.innerHTML = `<div class="empty">Your order is empty.<br>Add some crackers to get started 🎆</div>`;
     totalsBox.style.display = "none"; return;
@@ -460,9 +601,10 @@ function renderCart(){
     const row = document.createElement("div");
     row.className = "crow";
     row.innerHTML = `
-      <div class="cn"><div class="t">${it.name}</div><div class="s">${it.pack} • ${rupee(it.price)} each</div></div>
+      <div class="cn"><div class="t">${it.name}</div></div>
       <div class="stepper"><button aria-label="less">−</button><span class="qty">${q}</span><button aria-label="more">+</button></div>
       <div class="lp">${rupee(it.price*q)}</div>`;
+    row.style.animationDelay = (Math.min(keys.indexOf(code), 8) * 50) + "ms";
     row.querySelector("button[aria-label=less]").onclick = ()=>{ changeQty(code,-1); controls[code]&&controls[code]._draw(); };
     row.querySelector("button[aria-label=more]").onclick = ()=>{ changeQty(code, 1); controls[code]&&controls[code]._draw(); };
     cartItemsEl.appendChild(row);
@@ -487,64 +629,79 @@ function renderCart(){
 
 /* ---------- Search ---------- */
 const search = document.getElementById("search");
+const productSearch = document.getElementById("productSearch");
 const noresults = document.getElementById("noresults");
 search.addEventListener("input", ()=>{
   const q = search.value.trim().toLowerCase();
-  let anyVisible = false;
-  document.querySelectorAll(".cat").forEach(sec=>{
-    let shown = 0;
-    sec.querySelectorAll(".card").forEach(it=>{
-      const match = !q || it.dataset.search.includes(q);
-      it.style.display = match ? "" : "none";
-      if(match) shown++;
-    });
-    sec.style.display = shown>0 ? "block" : "none";
-    if(shown>0) anyVisible = true;
+  let any = false;
+  catGridEl.querySelectorAll(".cat-tile").forEach(tile=>{
+    const match = !q || tile.dataset.cat.includes(q) || tile.textContent.toLowerCase().includes(q);
+    tile.style.display = match ? "" : "none";
+    if(match) any = true;
   });
-  noresults.style.display = anyVisible ? "none" : "block";
+  noresults.style.display = any ? "none" : "block";
+});
+productSearch.addEventListener("input", ()=>{
+  const q = productSearch.value.trim().toLowerCase();
+  const sec = [...productMount.querySelectorAll(".cat")].find(s=> !s.hidden);
+  if(!sec) return;
+  sec.querySelectorAll(".card").forEach(card=>{
+    const match = !q || card.dataset.search.includes(q);
+    card.style.display = match ? "" : "none";
+    if(match) card.classList.add("reveal-visible");
+  });
 });
 
 /* ---------- Place order (WhatsApp text message) ---------- */
-function generateOrderNumber(){
-  return "TC-" + Date.now().toString().slice(-6);
-}
-
-function buildOrderMessage(orderNo, name, mobile, addr){
+function buildOrderMessage(name, mobile, email, addr){
   const byCat = {};
   for(const code in cart){
     const it = byCode[code];
     (byCat[it.cat] ||= []).push([it, cart[code]]);
   }
   const {sum,count} = totals();
+  const dated = new Date().toLocaleDateString("en-IN", {day:"numeric", month:"short", year:"numeric"});
+  const itemWord = count === 1 ? "item" : "items";
 
-  let msg = `New Order - ${SHOP_NAME}\n`;
-  msg += `Order #${orderNo}\n\n`;
+  let msg = `🪔 *${SHOP_NAME.toUpperCase()}*\n`;
+  msg += `_Happy Diwali • Sivakasi_\n\n`;
+  msg += `> 📅 ${dated}\n\n`;
+
   Object.keys(byCat).forEach(cat=>{
-    msg += `*${cat}*\n`;
+    const icon = CATEGORY_ICONS[cat] || "🎆";
+    msg += `*${icon} ${cat}*\n`;
     byCat[cat].forEach(([it,q])=>{
-      msg += `${it.name} x${q} - ${rupee(it.price*q)}\n`;
+      msg += `- ${it.name}  × ${q}  —  *${rupee(it.price*q)}*\n`;
     });
     msg += `\n`;
   });
-  msg += `Total (${count} item${count>1?"s":""}): *${rupee(sum)}*\n\n`;
-  msg += `Name: ${name}\nMobile: ${mobile}\nAddress: ${addr}\n\n`;
-  msg += `Free delivery in Tamil Nadu. All-India delivery available.`;
+
+  msg += `*Amount payable*\n`;
+  msg += `> 💰 *${rupee(sum)}*\n`;
+  msg += `> ${count} ${itemWord}\n\n`;
+
+  msg += `*Deliver to*\n`;
+  msg += `> 👤 ${name}\n`;
+  msg += `> 📱 ${mobile}\n`;
+  msg += `> ✉️ ${email}\n`;
+  msg += `> 📍 ${addr}`;
   return msg;
 }
 
 document.getElementById("placeBtn").onclick = ()=>{
   const name = document.getElementById("fName").value.trim();
   const mobile = document.getElementById("fMobile").value.trim();
+  const email = document.getElementById("fEmail").value.trim();
   const addr = document.getElementById("fAddr").value.trim();
   const err = document.getElementById("formErr");
 
   if(!name){ err.textContent="Please enter your name."; return; }
   if(mobile.replace(/\D/g,"").length < 10){ err.textContent="Please enter a valid 10-digit mobile number."; return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ err.textContent="Please enter a valid email."; return; }
   if(!addr){ err.textContent="Please enter your delivery address."; return; }
   err.textContent = "";
 
-  const orderNo = generateOrderNumber();
-  const msg = buildOrderMessage(orderNo, name, mobile, addr);
+  const msg = buildOrderMessage(name, mobile, email, addr);
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
   const isDesktop = window.innerWidth > 768;
@@ -566,9 +723,137 @@ document.getElementById("placeBtn").onclick = ()=>{
   window.scrollTo(0,0);
 };
 
+/* ---------- Navbar, hero motion, menus ---------- */
+const navbar = document.getElementById("navbar");
+const navToggle = document.getElementById("navToggle");
+const catDd = document.getElementById("catDd");
+const catBtn = document.getElementById("catBtn");
+const catPanel = document.getElementById("catPanel");
+const catFilter = document.getElementById("catFilter");
+const heroContent = document.querySelector(".hero-content");
+const heroBgImg = document.querySelector(".hero-bg-img");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function closeDropdown(){
+  catDd.classList.remove("open");
+  catBtn.setAttribute("aria-expanded", "false");
+  catPanel.hidden = true;
+}
+function closeMenus(){
+  closeDropdown();
+  navbar.classList.remove("menu-open");
+  navToggle.setAttribute("aria-expanded", "false");
+}
+
+catBtn.onclick = (e)=>{
+  e.stopPropagation();
+  const open = !catDd.classList.contains("open");
+  if(open){
+    catDd.classList.add("open");
+    catBtn.setAttribute("aria-expanded", "true");
+    catPanel.hidden = false;
+    if(window.innerWidth > 860) catFilter.focus();
+  } else {
+    closeDropdown();
+  }
+};
+navToggle.onclick = (e)=>{
+  e.stopPropagation();
+  const open = !navbar.classList.contains("menu-open");
+  navbar.classList.toggle("menu-open", open);
+  navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  if(!open) closeMenus();
+};
+catFilter.addEventListener("input", ()=>{
+  const q = catFilter.value.trim().toLowerCase();
+  catListEl.querySelectorAll(".cat-item").forEach(item=>{
+    item.hidden = q && !item.dataset.cat.includes(q) && !item.textContent.toLowerCase().includes(q);
+  });
+});
+document.addEventListener("click", (e)=>{
+  if(!catDd.contains(e.target) && !navToggle.contains(e.target) && !document.getElementById("navLinks").contains(e.target)){
+    closeMenus();
+  }
+});
+document.querySelectorAll('.nav-link[href^="#"]').forEach(link=>{
+  link.addEventListener("click", ()=> setTimeout(closeMenus, 50));
+});
+
+function syncNav(){
+  navbar.classList.toggle("scrolled", window.scrollY > 48);
+  if(!reduceMotion && window.scrollY < window.innerHeight){
+    const y = window.scrollY;
+    if(heroContent) heroContent.style.transform = `translateY(${y * 0.22}px)`;
+    if(heroBgImg) heroBgImg.style.translate = `0 ${y * 0.18}px`;
+  }
+}
+window.addEventListener("scroll", syncNav, {passive:true});
+syncNav();
+
+function splitTitle(el){
+  const text = el.textContent;
+  el.innerHTML = text.split("").map((ch,i)=>{
+    const safe = ch === " " ? "&nbsp;" : ch;
+    return `<span class="ch" style="animation-delay:${180 + i*42}ms">${safe}</span>`;
+  }).join("");
+}
+
+function spawnSparks(id, count){
+  const box = document.getElementById(id);
+  if(!box || reduceMotion) return;
+  for(let i=0;i<(count||22);i++){
+    const spark = document.createElement("i");
+    spark.style.left = (Math.random()*100) + "%";
+    spark.style.animationDuration = (5 + Math.random()*6) + "s";
+    spark.style.animationDelay = (Math.random()*6) + "s";
+    spark.style.width = spark.style.height = (3 + Math.random()*4) + "px";
+    box.appendChild(spark);
+  }
+}
+
 /* ---------- Init ---------- */
 document.getElementById("shopName").textContent = SHOP_NAME;
-document.getElementById("waLink").href = `https://wa.me/${WHATSAPP_NUMBER}`;
+document.getElementById("navBrand").textContent = SHOP_NAME;
+splitTitle(document.getElementById("shopName"));
+spawnSparks("sparks", 22);
+spawnSparks("shopSparks", 18);
+
+const waUrl = `https://wa.me/${WHATSAPP_NUMBER}`;
+["navWaIcon","contactWa","contactCta"].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.href = waUrl;
+});
+document.getElementById("contactCall").href = "tel:+91" + CALL_NUMBER.replace(/\D/g,"");
+
+const ig = INSTAGRAM_URL.trim();
+["navIg","contactIg"].forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(ig){ el.href = ig; return; }
+  el.removeAttribute("href");
+  el.setAttribute("aria-disabled","true");
+  el.tabIndex = -1;
+});
+
+document.getElementById("backCats").onclick = ()=> showBrowse({restore:true, scrollToShop:true});
+document.getElementById("navCombos").addEventListener("click", (e)=>{
+  e.preventDefault();
+  openCategory("combos");
+});
+document.getElementById("browseCta").addEventListener("click", ()=>{
+  showBrowse();
+  setTimeout(animateCategoryTiles, 350);
+});
+document.querySelector('.nav-brand').addEventListener("click", ()=> showBrowse());
+document.querySelector('a.nav-link[href="#hero"]').addEventListener("click", ()=> showBrowse());
+document.querySelector('a.nav-link[href="#contact"]').addEventListener("click", (e)=>{
+  e.preventDefault();
+  showBrowse();
+  closeMenus();
+  requestAnimationFrame(()=> document.getElementById("contact").scrollIntoView({behavior:"smooth"}));
+});
+document.getElementById("clearCart").onclick = clearCart;
+
 loadCart();
 Object.keys(cart).forEach(code=> controls[code] && controls[code]._draw());
 refreshBar();

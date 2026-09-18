@@ -25,19 +25,20 @@
           <div class="cat-list" id="catList"></div>
         </div>
       </div>
-      <a class="nav-link" href="#combos">Combos</a>
+      <a class="nav-link" href="#combos" id="navCombos">Combos</a>
       <a class="nav-link" href="#contact">Contact Us</a>
-      <a class="nav-wa" id="navWa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      <div class="nav-socials">
+        <a class="social" id="navIg" href="#" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7zm11.2 1.3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zM12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
+        </a>
+        <a class="social" id="navWaIcon" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 0 0-7.8 13.4L3 21l4.8-1.2A9 9 0 1 0 12 3zm0 2a7 7 0 0 1 5.9 10.8l-.3.4.7 2.5-2.5-.7-.4.2A7 7 0 1 1 12 5zm4 8.3c-.2-.1-1.2-.6-1.4-.7s-.3-.1-.5.1-.5.7-.7.8-.3.2-.5 0a5.7 5.7 0 0 1-1.7-1.1 6.3 6.3 0 0 1-1.2-1.5c-.1-.2 0-.3 0-.4l.4-.4.1-.3c0-.1 0-.3 0-.4s-.5-1.1-.6-1.5-.4-.3-.5-.3h-.4c-.2 0-.4.1-.6.3s-.7.7-.7 1.8.8 2.1.9 2.2 1.5 2.4 3.7 3.3a12 12 0 0 0 1.2.4 2.8 2.8 0 0 0 1.3.1c.4 0 1.2-.5 1.4-1s.2-.9.1-1-.1-.1-.3-.2z"/></svg>
+        </a>
+      </div>
     </div>
-    <div class="nav-actions">
-      <button class="nav-icon-btn" id="searchToggle" type="button" aria-label="Search crackers">🔍</button>
-      <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </div>
-  <div class="nav-search-dock" id="searchDock">
-    <input id="search" type="search" placeholder="Search crackers…" autocomplete="off" />
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
@@ -57,60 +58,85 @@
       <span class="cta-arrow">↓</span>
     </a>
     <div class="hero-meta">
-      <span>Free TN delivery</span>
+      <span>Free TN delivery on combos</span>
       <span>All-India shipping</span>
       <span>Min order ₹3000</span>
     </div>
   </div>
-  <a class="scroll-hint" href="#shop" aria-label="Scroll to crackers">
-    <span></span>
-  </a>
 </section>
 
-<div class="marquee" aria-hidden="true">
-  <div class="marquee-track" id="marqueeTrack"></div>
-</div>
+<div id="shop">
+  <div class="shop-scene" aria-hidden="true">
+    <div class="shop-scene-img"></div>
+    <div class="shop-scene-wash"></div>
+    <div class="sparks" id="shopSparks"></div>
+  </div>
 
-<div class="shop" id="shop">
-  <div class="shop-bg" aria-hidden="true"></div>
+  <div class="shop">
+    <main id="catalog">
+      <section class="browse-view" id="browseView">
+        <div class="browse-head reveal">
+          <p class="browse-kicker">The collection</p>
+          <h2>Pick a category</h2>
+          <p class="browse-copy">Tap a category to see every cracker in it.</p>
+          <input id="search" type="search" placeholder="Search categories…" autocomplete="off" />
+        </div>
+        <div class="cat-grid" id="catGrid"></div>
+        <div class="noresults" id="noresults" style="display:none">No categories match your search.</div>
+      </section>
 
-  <main id="catalog">
-    <div class="noresults" id="noresults" style="display:none">No crackers match your search.</div>
-  </main>
+      <section class="products-view" id="productsView" hidden>
+        <div class="products-toolbar">
+          <button class="back-cats" id="backCats" type="button">← All categories</button>
+          <input id="productSearch" type="search" placeholder="Search in this category…" autocomplete="off" />
+        </div>
+        <div id="productMount"></div>
+      </section>
+    </main>
 
-  <section class="contact" id="contact">
-    <div class="contact-card">
-      <p class="contact-kicker">Need help?</p>
-      <h2>Contact Us</h2>
-      <p class="contact-copy">Questions about packs, delivery or a custom combo? We’re on WhatsApp — same number you place orders on.</p>
-      <div class="contact-grid">
-        <div>
-          <strong>WhatsApp</strong>
-          <a id="contactWa" href="#">Chat with us</a>
+    <section class="contact" id="contact">
+      <div class="contact-card">
+        <p class="contact-kicker">Need help?</p>
+        <h2>Contact Us</h2>
+        <p class="contact-copy">Questions about packs, delivery or a custom combo? Call us or message on WhatsApp.</p>
+        <div class="contact-grid">
+          <div>
+            <strong>Call</strong>
+            <a id="contactCall" href="tel:+916374439080">+91 63744 39080</a>
+          </div>
+          <div>
+            <strong>WhatsApp</strong>
+            <a id="contactWa" href="#">Chat with us</a>
+          </div>
+          <div>
+            <strong>From</strong>
+            <span>Sivakasi, Tamil Nadu</span>
+          </div>
+          <div>
+            <strong>Delivery</strong>
+            <span>Free TN delivery on combos • All-India available</span>
+          </div>
         </div>
-        <div>
-          <strong>From</strong>
-          <span>Sivakasi, Tamil Nadu</span>
-        </div>
-        <div>
-          <strong>Delivery</strong>
-          <span>Free in Tamil Nadu • All-India available</span>
-        </div>
-        <div>
-          <strong>Minimum order</strong>
-          <span>₹3,000</span>
+        <div class="contact-socials">
+          <a class="social lg" id="contactIg" href="#" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7zm11.2 1.3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zM12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
+            <span>Instagram</span>
+          </a>
+          <a class="social lg" id="contactCta" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 0 0-7.8 13.4L3 21l4.8-1.2A9 9 0 1 0 12 3zm0 2a7 7 0 0 1 5.9 10.8l-.3.4.7 2.5-2.5-.7-.4.2A7 7 0 1 1 12 5zm4 8.3c-.2-.1-1.2-.6-1.4-.7s-.3-.1-.5.1-.5.7-.7.8-.3.2-.5 0a5.7 5.7 0 0 1-1.7-1.1 6.3 6.3 0 0 1-1.2-1.5c-.1-.2 0-.3 0-.4l.4-.4.1-.3c0-.1 0-.3 0-.4s-.5-1.1-.6-1.5-.4-.3-.5-.3h-.4c-.2 0-.4.1-.6.3s-.7.7-.7 1.8.8 2.1.9 2.2 1.5 2.4 3.7 3.3a12 12 0 0 0 1.2.4 2.8 2.8 0 0 0 1.3.1c.4 0 1.2-.5 1.4-1s.2-.9.1-1-.1-.1-.3-.2z"/></svg>
+            <span>WhatsApp</span>
+          </a>
         </div>
       </div>
-      <a class="btn-primary contact-cta" id="contactCta" href="#">Message on WhatsApp</a>
-    </div>
-  </section>
+    </section>
 
-  <div class="divider reveal">🪔 Wishing you a safe and sparkling Diwali 🪔</div>
+    <div class="divider reveal">🪔 Wishing you a safe and sparkling Diwali 🪔</div>
 
-  <footer>
-    Thala Crackers • Sivakasi • Made for Diwali 🪔<br>
-    Please burst crackers safely. Keep water nearby &amp; children supervised.
-  </footer>
+    <footer>
+      Thala Crackers • Sivakasi • Made for Diwali 🪔<br>
+      Please burst crackers safely. Keep water nearby &amp; children supervised.
+    </footer>
+  </div>
 </div>
 
 <div class="cartbar" id="cartbar">
@@ -125,6 +151,7 @@
     <div class="cartpage-head">
       <button class="backbtn" id="closeCart" aria-label="Back to catalog">← Back</button>
       <h3>Your Order</h3>
+      <button class="clear-cart" id="clearCart" type="button" hidden>Clear cart</button>
     </div>
     <div class="cartpage-body">
       <div id="cartItems"></div>
@@ -139,8 +166,8 @@
           <input id="fName" type="text" placeholder="Your name" />
           <label>Mobile number *</label>
           <input id="fMobile" type="tel" inputmode="numeric" placeholder="10-digit mobile" />
-          <label>Email (optional)</label>
-          <input id="fEmail" type="email" placeholder="you@email.com" />
+          <label>Email *</label>
+          <input id="fEmail" type="email" placeholder="you@email.com" required />
           <label>Delivery address *</label>
           <textarea id="fAddr" placeholder="House no, street, area, city, pincode"></textarea>
         </div>
