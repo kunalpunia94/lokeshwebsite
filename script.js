@@ -275,7 +275,7 @@ function totals(){ let sum=0,count=0; for(const k in cart){ sum += byCode[k].pri
 
 /* ---------- Render catalog ---------- */
 const catalogEl = document.getElementById("catalog");
-const pillnavEl = document.getElementById("pillnav");
+const catListEl = document.getElementById("catList");
 const controls = {};
 const CATEGORY_ICONS = {
   "Sparklers":"✨","Special Colourful Sparklers 2025":"✨","Flower Pots":"🎇","Multi Colour Flower Pots":"🎇",
@@ -298,26 +298,31 @@ const CATEGORY_ICONS = {
 const PHOTO_BANNER_AFTER = { 4: {msg:"Light up every corner", sub:"Explore our full Diwali collection"}, 14: {msg:"Sivakasi's finest, delivered to you", sub:"Free delivery across Tamil Nadu"} };
 
 CATALOG.forEach(([cat,items],ci) => {
-  const secId = "cat"+ci;
+  const isCombos = cat === "Gift Boxes" || cat === "Combo Packs";
+  const secId = isCombos && cat === "Gift Boxes" ? "combos" : "cat"+ci;
   const icon = CATEGORY_ICONS[cat] || "🎆";
   const sec = document.createElement("section");
   sec.className = "cat reveal"; sec.id = secId; sec.dataset.cat = cat.toLowerCase();
-  sec.innerHTML = `<h2>${icon} ${cat} <span class="count">(${items.length})</span></h2><div class="bar"></div><div class="grid"></div>`;
+  if(cat === "Combo Packs") sec.setAttribute("data-combo", "1");
+  sec.innerHTML = `<h2><span class="title-text">${icon} ${cat}</span> <span class="count">(${items.length})</span></h2><div class="bar"></div><div class="grid"></div>`;
   const gridEl = sec.querySelector(".grid");
   items.forEach((it, idx) => {
     const [code,name,pack,price] = it;
     const mrp = Math.round(price * 4 * 100) / 100;
     const card = document.createElement("div");
-    card.className = "card"; card.dataset.code = code; card.dataset.search = (name+" "+cat).toLowerCase();
-    card.style.transitionDelay = (Math.min(idx,8) * 40) + "ms";
+    card.className = "card reveal-card"; card.dataset.code = code; card.dataset.search = (name+" "+cat).toLowerCase();
+    card.style.transitionDelay = ((idx % 8) * 55) + "ms";
     card.innerHTML = `
-      <div class="badge">75% OFF</div>
-      <div class="tile">${icon}</div>
-      <div class="name">${name}</div>
-      <div class="sub">${pack}</div>
-      <div class="pricerow"><span class="mrp">${rupee(mrp)}</span><span class="price">${rupee(price)}</span></div>
-      <div class="ctrl"></div>`;
+      <div class="glare"></div>
+      <div class="card-inner">
+        <div class="tile">${icon}</div>
+        <div class="name">${name}</div>
+        <div class="sub">${pack}</div>
+        <div class="pricerow"><span class="mrp">${rupee(mrp)}</span><span class="price">${rupee(price)}</span></div>
+        <div class="ctrl"></div>
+      </div>`;
     card.querySelector(".ctrl").appendChild(makeControl(code));
+    attachTilt(card);
     gridEl.appendChild(card);
   });
   catalogEl.appendChild(sec);
@@ -330,20 +335,21 @@ CATALOG.forEach(([cat,items],ci) => {
     catalogEl.appendChild(banner);
   }
 
-  const pill = document.createElement("button");
-  pill.type = "button"; pill.className = "pill"; pill.textContent = icon+" "+cat;
-  pill.onclick = () => {
+  const item = document.createElement("button");
+  item.type = "button"; item.className = "cat-item";
+  item.textContent = icon+" "+cat;
+  item.dataset.cat = cat.toLowerCase();
+  item.onclick = () => {
     document.getElementById(secId).scrollIntoView({behavior:"smooth"});
-    document.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));
-    pill.classList.add("active");
+    closeMenus();
   };
-  pillnavEl.appendChild(pill);
+  catListEl.appendChild(item);
 });
 
 /* ---------- Scroll reveal ---------- */
 function revealIfInViewport(el){
   const r = el.getBoundingClientRect();
-  if(r.top < window.innerHeight && r.bottom > 0){
+  if(r.top < window.innerHeight * 0.92 && r.bottom > 0){
     el.classList.add("reveal-visible");
     return true;
   }
@@ -358,20 +364,16 @@ if("IntersectionObserver" in window){
         revealObserver.unobserve(entry.target);
       }
     });
-  }, {threshold:0});
-  const revealEls = document.querySelectorAll(".reveal");
-  revealEls.forEach(el=> revealObserver.observe(el));
+  }, {threshold:0.12, rootMargin:"0px 0px -8% 0px"});
+  document.querySelectorAll(".reveal, .reveal-card").forEach(el=> revealObserver.observe(el));
 
-  // Safety net: a manual viewport check on scroll/resize catches any element
-  // the observer misses (e.g. due to timing edge cases), so nothing stays
-  // permanently hidden.
   let revealCheckQueued = false;
   function queueRevealCheck(){
     if(revealCheckQueued) return;
     revealCheckQueued = true;
     requestAnimationFrame(()=>{
       revealCheckQueued = false;
-      document.querySelectorAll(".reveal:not(.reveal-visible)").forEach(el=>{
+      document.querySelectorAll(".reveal:not(.reveal-visible), .reveal-card:not(.reveal-visible)").forEach(el=>{
         if(revealIfInViewport(el)) revealObserver.unobserve(el);
       });
     });
@@ -380,22 +382,28 @@ if("IntersectionObserver" in window){
   window.addEventListener("resize", queueRevealCheck);
   queueRevealCheck();
 } else {
-  document.querySelectorAll(".reveal").forEach(el=> el.classList.add("reveal-visible"));
+  document.querySelectorAll(".reveal, .reveal-card").forEach(el=> el.classList.add("reveal-visible"));
 }
 
-/* ---------- Pill nav arrows + wheel scroll ---------- */
-const pillLeft = document.getElementById("pillLeft");
-const pillRight = document.getElementById("pillRight");
-if(pillLeft && pillRight){
-  pillLeft.onclick = ()=> pillnavEl.scrollBy({left:-220, behavior:"smooth"});
-  pillRight.onclick = ()=> pillnavEl.scrollBy({left:220, behavior:"smooth"});
+function attachTilt(card){
+  if(!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+  const glare = card.querySelector(".glare");
+  card.addEventListener("mousemove", (e)=>{
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    card.style.setProperty("--tilt-x", ((0.5 - y) * 8).toFixed(2) + "deg");
+    card.style.setProperty("--tilt-y", ((x - 0.5) * 10).toFixed(2) + "deg");
+    if(glare){
+      card.style.setProperty("--glare-x", (x * 100).toFixed(1) + "%");
+      card.style.setProperty("--glare-y", (y * 100).toFixed(1) + "%");
+    }
+  });
+  card.addEventListener("mouseleave", ()=>{
+    card.style.setProperty("--tilt-x", "0deg");
+    card.style.setProperty("--tilt-y", "0deg");
+  });
 }
-pillnavEl.addEventListener("wheel", (e)=>{
-  if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
-    e.preventDefault();
-    pillnavEl.scrollLeft += e.deltaY;
-  }
-}, {passive:false});
 
 function makeControl(code){
   const wrap = document.createElement("div");

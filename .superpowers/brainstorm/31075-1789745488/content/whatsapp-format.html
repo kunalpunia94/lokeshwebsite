@@ -1,0 +1,48 @@
+<h2>Improved WhatsApp order message</h2>
+<p class="subtitle">Grouped by category, compact lines, bold headers using WhatsApp's own *bold* / _italic_ formatting. This is exactly what gets pasted into the chat.</p>
+
+<div class="mockup">
+  <div class="mockup-header">Preview — WhatsApp bubble</div>
+  <div class="mockup-body" style="background:#dcf8c6;padding:16px 14px;border-radius:10px;font-family:Helvetica,Arial,sans-serif;font-size:13.5px;line-height:1.5;color:#111;max-width:380px">
+<div style="font-size:15px;font-weight:700;margin-bottom:8px">🪔 New Order — Thala Crackers</div>
+<div style="font-weight:700;margin:10px 0 2px">✨ SPARKLERS</div>
+1. 7 Cm Electric × 1 — ₹91<br>
+2. 7 Cm Colour × 1 — ₹112<br>
+3. 15 Cm Electric × 5 — ₹188<br>
+<div style="font-weight:700;margin:10px 0 2px">🌸 FLOWER POTS</div>
+4. Flower Pots Special × 1 — ₹94<br>
+5. Colour Koti XL × 2 — ₹438<br>
+<div style="font-weight:700;margin:10px 0 2px">🎇 CHAKKARS</div>
+6. Ground Chakker Delux × 1 — ₹130<br>
+<hr style="border:none;border-top:1px dashed #9bbf8f;margin:10px 0">
+<div>🧾 <b>Total items:</b> 10</div>
+<div>💰 <b>Order value: ₹1,053</b></div>
+<div style="margin-top:10px;font-weight:700">👤 Customer Details</div>
+<div>Name: Kunal Punia</div>
+<div>Mobile: 9876543210</div>
+<div>Address: 12 Main St, Chennai, TN 600001</div>
+<div style="margin-top:10px;font-size:12px;color:#4a4a4a">📍 Delivery: Free (Tamil Nadu)</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>What changed vs. the old message</h3>
+  <ul>
+    <li>Items grouped under bold <b>category headers</b> with a matching emoji — scan by category instead of hunting through one long list</li>
+    <li>Each line drops the repeated pack-size text (e.g. "1 Box (10 pcs)") — that only matters when picking the item, not confirming an order</li>
+    <li>Totals get their own clearly separated block with icons (🧾 items, 💰 value) instead of being buried in a paragraph</li>
+    <li>Customer details get a labeled section header instead of running straight into the item list</li>
+    <li>A delivery note line at the bottom confirms free/TN or "charge to be confirmed" for other states</li>
+  </ul>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="approve" onclick="toggleSelect(this)">
+    <div class="letter">✓</div>
+    <div class="content"><h3>This looks good</h3><p>Build the site with this WhatsApp message format</p></div>
+  </div>
+  <div class="option" data-choice="tweak" onclick="toggleSelect(this)">
+    <div class="letter">✎</div>
+    <div class="content"><h3>Close, but I want changes</h3><p>Tell me what to adjust in the terminal</p></div>
+  </div>
+</div>
