@@ -10,7 +10,7 @@
    const WHATSAPP_NUMBER = "919345273268";   // <<< PUT YOUR REAL NUMBER HERE
    const CALL_NUMBER     = "6374439080";     // shown on Contact Us, digits only
    const INSTAGRAM_URL   = "";               // paste your Instagram profile link
-   const SHOP_NAME       = "Thala Crackers";
+   let SHOP_NAME         = "Thala Crackers";
    const MIN_ORDER       = 3000;
 /* ===================================================================== */
 
@@ -812,9 +812,10 @@ function spawnSparks(id, count){
 }
 
 /* ---------- Init ---------- */
-document.getElementById("shopName").textContent = SHOP_NAME;
+const shopNameEl = document.getElementById("shopName");
+if(shopNameEl && shopNameEl.textContent.trim()) SHOP_NAME = shopNameEl.textContent.trim();
 document.getElementById("navBrand").textContent = SHOP_NAME;
-splitTitle(document.getElementById("shopName"));
+splitTitle(shopNameEl);
 spawnSparks("sparks", 22);
 spawnSparks("shopSparks", 18);
 
