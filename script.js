@@ -428,45 +428,35 @@ search.addEventListener("input", ()=>{
   noresults.style.display = anyVisible ? "none" : "block";
 });
 
-/* ---------- Place order (receipt image + WhatsApp) ---------- */
+/* ---------- Place order (WhatsApp text message) ---------- */
 function generateOrderNumber(){
   return "TC-" + Date.now().toString().slice(-6);
 }
 
-function buildReceipt(orderNo, name, mobile, addr){
-  document.getElementById("rShop").textContent = SHOP_NAME;
-  document.getElementById("rOrderNo").textContent = "Order #"+orderNo;
-  document.getElementById("rDate").textContent = new Date().toLocaleString("en-IN", {dateStyle:"medium", timeStyle:"short"});
-
+function buildOrderMessage(orderNo, name, mobile, addr){
   const byCat = {};
   for(const code in cart){
     const it = byCode[code];
     (byCat[it.cat] ||= []).push([it, cart[code]]);
   }
-  const itemsEl = document.getElementById("rItems");
-  itemsEl.innerHTML = "";
-  Object.keys(byCat).forEach(cat=>{
-    const catDiv = document.createElement("div");
-    catDiv.className = "receipt-cat";
-    catDiv.textContent = cat;
-    itemsEl.appendChild(catDiv);
-    byCat[cat].forEach(([it,q])=>{
-      const line = document.createElement("div");
-      line.className = "receipt-line";
-      line.innerHTML = `<span>${it.name} ×${q}</span><b>${rupee(it.price*q)}</b>`;
-      itemsEl.appendChild(line);
-    });
-  });
-
   const {sum,count} = totals();
-  document.getElementById("rCount").textContent = count+" item"+(count>1?"s":"");
-  document.getElementById("rGrand").textContent = rupee(sum);
 
-  document.getElementById("rCustomer").innerHTML =
-    `<b>${name}</b><br>${mobile}<br>${addr}<br><span style="color:#1a8a3f">🚚 Free delivery (Tamil Nadu) / All-India delivery available</span>`;
+  let msg = `New Order - ${SHOP_NAME}\n`;
+  msg += `Order #${orderNo}\n\n`;
+  Object.keys(byCat).forEach(cat=>{
+    msg += `*${cat}*\n`;
+    byCat[cat].forEach(([it,q])=>{
+      msg += `${it.name} x${q} - ${rupee(it.price*q)}\n`;
+    });
+    msg += `\n`;
+  });
+  msg += `Total (${count} item${count>1?"s":""}): *${rupee(sum)}*\n\n`;
+  msg += `Name: ${name}\nMobile: ${mobile}\nAddress: ${addr}\n\n`;
+  msg += `Free delivery in Tamil Nadu. All-India delivery available.`;
+  return msg;
 }
 
-document.getElementById("placeBtn").onclick = async ()=>{
+document.getElementById("placeBtn").onclick = ()=>{
   const name = document.getElementById("fName").value.trim();
   const mobile = document.getElementById("fMobile").value.trim();
   const addr = document.getElementById("fAddr").value.trim();
@@ -478,22 +468,26 @@ document.getElementById("placeBtn").onclick = async ()=>{
   err.textContent = "";
 
   const orderNo = generateOrderNumber();
-  buildReceipt(orderNo, name, mobile, addr);
-
-  const receiptEl = document.getElementById("receiptCard");
-  const canvas = await html2canvas(receiptEl, {backgroundColor:"#fffaf0", scale:2});
-  const dataUrl = canvas.toDataURL("image/png");
-  const a = document.createElement("a");
-  a.href = dataUrl;
-  a.download = `${orderNo}-receipt.png`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-
-  const {sum,count} = totals();
-  const msg = `🪔 *New Order — ${SHOP_NAME}*\nOrder #${orderNo}\n${count} item${count>1?"s":""}, Total: ${rupee(sum)}\n\nPlease find my order receipt attached 👇\n(Tap 📎 to attach ${orderNo}-receipt.png from your downloads)\n\nName: ${name}\nMobile: ${mobile}`;
+  const msg = buildOrderMessage(orderNo, name, mobile, addr);
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-  window.location.href = url;
+
+  const isDesktop = window.innerWidth > 768;
+  if(isDesktop){
+    window.open(url, "_blank", "noopener");
+  } else {
+    window.location.href = url;
+  }
+
+  Object.keys(cart).forEach(code=> delete cart[code]);
+  saveCart();
+  refreshBar();
+  Object.keys(controls).forEach(code=> controls[code]._draw());
+  closeCart();
+  document.getElementById("fName").value = "";
+  document.getElementById("fMobile").value = "";
+  document.getElementById("fEmail").value = "";
+  document.getElementById("fAddr").value = "";
+  window.scrollTo(0,0);
 };
 
 /* ---------- Init ---------- */

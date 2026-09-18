@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -29,35 +28,40 @@
 <main id="catalog"><div class="noresults" id="noresults" style="display:none">No crackers match your search.</div></main>
 
 <div class="cartbar" id="cartbar">
-  <button id="openCart">
+  <button class="btn-primary" id="openCart">
     <span>🛒 View Order <span class="n" id="barCount">0</span></span>
     <span id="barTotal">₹0</span>
   </button>
 </div>
 
 <div class="overlay" id="overlay">
-  <div class="sheet" id="sheet">
-    <h3>Your Order <span class="x" id="closeCart">×</span></h3>
-    <div id="cartItems"></div>
+  <div class="cartpage" id="sheet">
+    <div class="cartpage-head">
+      <button class="backbtn" id="closeCart" aria-label="Back to catalog">← Back</button>
+      <h3>Your Order</h3>
+    </div>
+    <div class="cartpage-body">
+      <div id="cartItems"></div>
 
-    <div class="totals" id="totalsBox" style="display:none">
-      <div class="line"><span id="itemCountLbl">Items</span><span id="cartSubtotal">₹0</span></div>
-      <div class="line grand"><span>Total</span><span id="cartGrand">₹0</span></div>
-      <div class="minwarn" id="minWarn" style="display:none"></div>
+      <div class="totals" id="totalsBox" style="display:none">
+        <div class="line"><span id="itemCountLbl">Items</span><span id="cartSubtotal">₹0</span></div>
+        <div class="line grand"><span>Total</span><span id="cartGrand">₹0</span></div>
+        <div class="minwarn" id="minWarn" style="display:none"></div>
 
-      <div class="form">
-        <label>Full name *</label>
-        <input id="fName" type="text" placeholder="Your name" />
-        <label>Mobile number *</label>
-        <input id="fMobile" type="tel" inputmode="numeric" placeholder="10-digit mobile" />
-        <label>Email (optional)</label>
-        <input id="fEmail" type="email" placeholder="you@email.com" />
-        <label>Delivery address *</label>
-        <textarea id="fAddr" placeholder="House no, street, area, city, pincode"></textarea>
+        <div class="form">
+          <label>Full name *</label>
+          <input id="fName" type="text" placeholder="Your name" />
+          <label>Mobile number *</label>
+          <input id="fMobile" type="tel" inputmode="numeric" placeholder="10-digit mobile" />
+          <label>Email (optional)</label>
+          <input id="fEmail" type="email" placeholder="you@email.com" />
+          <label>Delivery address *</label>
+          <textarea id="fAddr" placeholder="House no, street, area, city, pincode"></textarea>
+        </div>
+        <div class="err" id="formErr"></div>
+        <button class="btn-primary place" id="placeBtn">Place Order on WhatsApp</button>
+        <div class="hint">Tapping this opens WhatsApp with your full order ready — just press <b>send</b> and we'll confirm delivery & payment.</div>
       </div>
-      <div class="err" id="formErr"></div>
-      <button class="place" id="placeBtn">🟢 Place Order on WhatsApp</button>
-      <div class="hint">Tapping this opens WhatsApp with your full order ready — just press <b>send</b> and we'll confirm delivery & payment.</div>
     </div>
   </div>
 </div>
@@ -68,26 +72,6 @@
   Thala Crackers • Sivakasi • Made for Diwali 🪔<br>
   Please burst crackers safely. Keep water nearby & children supervised.
 </footer>
-
-<div id="receiptCard" style="position:fixed;left:-9999px;top:0;width:360px;font-family:'Poppins',sans-serif;background:#fffaf0;border-radius:16px;overflow:hidden">
-  <div class="receipt-head">
-    <div class="receipt-diyas">🪔✨🪔</div>
-    <div class="receipt-shop" id="rShop">Thala Crackers</div>
-    <div class="receipt-sub">Sivakasi Direct • Order Receipt</div>
-  </div>
-  <div class="receipt-body">
-    <div class="receipt-meta">
-      <span id="rOrderNo">Order #TC-000000</span><span id="rDate"></span>
-    </div>
-    <div class="receipt-items" id="rItems"></div>
-    <div class="receipt-total">
-      <span id="rCount">0 items</span>
-      <span id="rGrand">₹0</span>
-    </div>
-    <div class="receipt-customer" id="rCustomer"></div>
-  </div>
-  <div class="receipt-foot">Please burst crackers safely 🎆 Happy Diwali!</div>
-</div>
 
 <script src="script.js"></script>
 </body>
