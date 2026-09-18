@@ -295,18 +295,21 @@ const CATEGORY_ICONS = {
   "Balaji Brand SPL New Fancy":"🦸","Gift Boxes":"🎁","Combo Packs":"📦"
 };
 
+const PHOTO_BANNER_AFTER = { 4: {msg:"Light up every corner", sub:"Explore our full Diwali collection"}, 14: {msg:"Sivakasi's finest, delivered to you", sub:"Free delivery across Tamil Nadu"} };
+
 CATALOG.forEach(([cat,items],ci) => {
   const secId = "cat"+ci;
   const icon = CATEGORY_ICONS[cat] || "🎆";
   const sec = document.createElement("section");
-  sec.className = "cat"; sec.id = secId; sec.dataset.cat = cat.toLowerCase();
+  sec.className = "cat reveal"; sec.id = secId; sec.dataset.cat = cat.toLowerCase();
   sec.innerHTML = `<h2>${icon} ${cat} <span class="count">(${items.length})</span></h2><div class="bar"></div><div class="grid"></div>`;
   const gridEl = sec.querySelector(".grid");
-  items.forEach(it => {
+  items.forEach((it, idx) => {
     const [code,name,pack,price] = it;
     const mrp = Math.round(price * 4 * 100) / 100;
     const card = document.createElement("div");
     card.className = "card"; card.dataset.code = code; card.dataset.search = (name+" "+cat).toLowerCase();
+    card.style.transitionDelay = (Math.min(idx,8) * 40) + "ms";
     card.innerHTML = `
       <div class="badge">75% OFF</div>
       <div class="tile">${icon}</div>
@@ -319,6 +322,14 @@ CATALOG.forEach(([cat,items],ci) => {
   });
   catalogEl.appendChild(sec);
 
+  if(PHOTO_BANNER_AFTER[ci]){
+    const {msg,sub} = PHOTO_BANNER_AFTER[ci];
+    const banner = document.createElement("div");
+    banner.className = "photobanner reveal";
+    banner.innerHTML = `<div><div class="msg">${msg}</div><div class="sub">${sub}</div></div>`;
+    catalogEl.appendChild(banner);
+  }
+
   const pill = document.createElement("button");
   pill.type = "button"; pill.className = "pill"; pill.textContent = icon+" "+cat;
   pill.onclick = () => {
@@ -328,6 +339,63 @@ CATALOG.forEach(([cat,items],ci) => {
   };
   pillnavEl.appendChild(pill);
 });
+
+/* ---------- Scroll reveal ---------- */
+function revealIfInViewport(el){
+  const r = el.getBoundingClientRect();
+  if(r.top < window.innerHeight && r.bottom > 0){
+    el.classList.add("reveal-visible");
+    return true;
+  }
+  return false;
+}
+
+if("IntersectionObserver" in window){
+  const revealObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add("reveal-visible");
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0});
+  const revealEls = document.querySelectorAll(".reveal");
+  revealEls.forEach(el=> revealObserver.observe(el));
+
+  // Safety net: a manual viewport check on scroll/resize catches any element
+  // the observer misses (e.g. due to timing edge cases), so nothing stays
+  // permanently hidden.
+  let revealCheckQueued = false;
+  function queueRevealCheck(){
+    if(revealCheckQueued) return;
+    revealCheckQueued = true;
+    requestAnimationFrame(()=>{
+      revealCheckQueued = false;
+      document.querySelectorAll(".reveal:not(.reveal-visible)").forEach(el=>{
+        if(revealIfInViewport(el)) revealObserver.unobserve(el);
+      });
+    });
+  }
+  window.addEventListener("scroll", queueRevealCheck, {passive:true});
+  window.addEventListener("resize", queueRevealCheck);
+  queueRevealCheck();
+} else {
+  document.querySelectorAll(".reveal").forEach(el=> el.classList.add("reveal-visible"));
+}
+
+/* ---------- Pill nav arrows + wheel scroll ---------- */
+const pillLeft = document.getElementById("pillLeft");
+const pillRight = document.getElementById("pillRight");
+if(pillLeft && pillRight){
+  pillLeft.onclick = ()=> pillnavEl.scrollBy({left:-220, behavior:"smooth"});
+  pillRight.onclick = ()=> pillnavEl.scrollBy({left:220, behavior:"smooth"});
+}
+pillnavEl.addEventListener("wheel", (e)=>{
+  if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+    e.preventDefault();
+    pillnavEl.scrollLeft += e.deltaY;
+  }
+}, {passive:false});
 
 function makeControl(code){
   const wrap = document.createElement("div");

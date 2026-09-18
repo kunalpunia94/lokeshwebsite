@@ -22,7 +22,11 @@
 
 <div class="controls">
   <input id="search" type="search" placeholder="🔍 Search crackers…" autocomplete="off" />
-  <div class="pillnav" id="pillnav"></div>
+  <div class="pillnav-wrap">
+    <button class="pillarrow" id="pillLeft" aria-label="Scroll categories left" type="button">‹</button>
+    <div class="pillnav" id="pillnav"></div>
+    <button class="pillarrow" id="pillRight" aria-label="Scroll categories right" type="button">›</button>
+  </div>
 </div>
 
 <main id="catalog"><div class="noresults" id="noresults" style="display:none">No crackers match your search.</div></main>
@@ -66,7 +70,7 @@
   </div>
 </div>
 
-<div class="divider">🪔 Wishing you a safe and sparkling Diwali 🪔</div>
+<div class="divider reveal">🪔 Wishing you a safe and sparkling Diwali 🪔</div>
 
 <footer>
   Thala Crackers • Sivakasi • Made for Diwali 🪔<br>
