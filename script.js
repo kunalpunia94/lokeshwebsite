@@ -275,29 +275,58 @@ function totals(){ let sum=0,count=0; for(const k in cart){ sum += byCode[k].pri
 
 /* ---------- Render catalog ---------- */
 const catalogEl = document.getElementById("catalog");
-const jumpEl = document.getElementById("jump");
+const pillnavEl = document.getElementById("pillnav");
 const controls = {};
+const CATEGORY_ICONS = {
+  "Sparklers":"✨","Special Colourful Sparklers 2025":"✨","Flower Pots":"🎇","Multi Colour Flower Pots":"🎇",
+  "Chakkars (Ground)":"🌀","Plastic Chakkar SPL 2025":"🌀","Twinkling Star":"⭐","One Sound Crackers":"💥",
+  "Wonder Candle 2023 (Sky King)":"🕯️","Colour Crackling Guns":"🔫","Bijili Crackers":"⚡","Bombs":"💣",
+  "Super Sound SPL Wala Crackers":"💥","Blue Star Brand SPL Fancy":"🎆","Moorthy Brand SPL Fancy":"🎆",
+  "Moorthy Brand SPL Setout Display":"🎆","Liya Brand SPL IPL New Fancy":"🎆","Sonny Brand Mega Display":"🎆",
+  "INF Big Brand Unique Fancy":"🎆","Wow Star Brand SPL Colours":"🎨","Vanitha Brand SPL Colour Fancy":"🎨",
+  "NSV Brand Fancy Collection":"🎆","Bee Brand":"🐝","Mega Sky Display Fancy":"🎆","Asok Brand 2026 SPL":"🍸",
+  "Sky Rockets":"🚀","Mega Multicolour Shots":"🎇","Multi Colour Shot (Budget)":"🎇","Vanitha Products":"🎀",
+  "Mini Arial Fancy":"🎆","Twin Colour Crackling Fountain (Vimal)":"⛲","Whizzling Shot":"🎇",
+  "Vadivel Product 2026 (New)":"🎭","Sri Vijay Brand Fancy":"🎆","Colour Crackling Fountain":"⛲",
+  "3pcs Fountain Sky King":"⛲","Crackling & Colour Fountain 2021 SPL":"⛲","Sky King Double & Triple Function":"🎆",
+  "New Collection Colour, Mani & Crackling Paper":"💰","Fancy Functions — Collection Sky King":"🎆",
+  "Children's Fancy SPL Novelties":"🎈","2026 New Children's Novelties":"🎈","Peacock 180° Fountain":"🦚",
+  "Mega Match Boxes":"🔥","Guns":"🔫","Sky King Brand New 2026":"🎆","Paper Bomb":"💣",
+  "Balaji Brand SPL New Fancy":"🦸","Gift Boxes":"🎁","Combo Packs":"📦"
+};
+
 CATALOG.forEach(([cat,items],ci) => {
   const secId = "cat"+ci;
+  const icon = CATEGORY_ICONS[cat] || "🎆";
   const sec = document.createElement("section");
   sec.className = "cat"; sec.id = secId; sec.dataset.cat = cat.toLowerCase();
-  sec.innerHTML = `<h2>${cat} <span class="count">(${items.length})</span></h2><div class="bar"></div>`;
+  sec.innerHTML = `<h2>${icon} ${cat} <span class="count">(${items.length})</span></h2><div class="bar"></div><div class="grid"></div>`;
+  const gridEl = sec.querySelector(".grid");
   items.forEach(it => {
     const [code,name,pack,price] = it;
-    const row = document.createElement("div");
-    row.className = "item"; row.dataset.code = code; row.dataset.search = (name+" "+cat).toLowerCase();
-    row.innerHTML = `
-      <div class="info">
-        <div class="name">${name}</div>
-        <div class="sub">${pack} • Code ${code}</div>
-      </div>
-      <div class="price">${rupee(price)}</div>
+    const mrp = Math.round(price * 4 * 100) / 100;
+    const card = document.createElement("div");
+    card.className = "card"; card.dataset.code = code; card.dataset.search = (name+" "+cat).toLowerCase();
+    card.innerHTML = `
+      <div class="badge">75% OFF</div>
+      <div class="tile">${icon}</div>
+      <div class="name">${name}</div>
+      <div class="sub">${pack}</div>
+      <div class="pricerow"><span class="mrp">${rupee(mrp)}</span><span class="price">${rupee(price)}</span></div>
       <div class="ctrl"></div>`;
-    row.querySelector(".ctrl").appendChild(makeControl(code));
-    sec.appendChild(row);
+    card.querySelector(".ctrl").appendChild(makeControl(code));
+    gridEl.appendChild(card);
   });
   catalogEl.appendChild(sec);
-  const opt = document.createElement("option"); opt.value = secId; opt.textContent = cat; jumpEl.appendChild(opt);
+
+  const pill = document.createElement("button");
+  pill.type = "button"; pill.className = "pill"; pill.textContent = icon+" "+cat;
+  pill.onclick = () => {
+    document.getElementById(secId).scrollIntoView({behavior:"smooth"});
+    document.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));
+    pill.classList.add("active");
+  };
+  pillnavEl.appendChild(pill);
 });
 
 function makeControl(code){
@@ -380,7 +409,7 @@ function renderCart(){
   }
 }
 
-/* ---------- Search & jump ---------- */
+/* ---------- Search ---------- */
 const search = document.getElementById("search");
 const noresults = document.getElementById("noresults");
 search.addEventListener("input", ()=>{
@@ -388,20 +417,15 @@ search.addEventListener("input", ()=>{
   let anyVisible = false;
   document.querySelectorAll(".cat").forEach(sec=>{
     let shown = 0;
-    sec.querySelectorAll(".item").forEach(it=>{
+    sec.querySelectorAll(".card").forEach(it=>{
       const match = !q || it.dataset.search.includes(q);
-      it.style.display = match ? "flex" : "none";
+      it.style.display = match ? "" : "none";
       if(match) shown++;
     });
     sec.style.display = shown>0 ? "block" : "none";
     if(shown>0) anyVisible = true;
   });
   noresults.style.display = anyVisible ? "none" : "block";
-});
-jumpEl.addEventListener("change", ()=>{
-  const el = document.getElementById(jumpEl.value);
-  if(el){ el.scrollIntoView({behavior:"smooth"}); }
-  jumpEl.selectedIndex = 0;
 });
 
 /* ---------- Place order (WhatsApp) ---------- */

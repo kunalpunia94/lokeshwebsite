@@ -11,19 +11,18 @@
 </head>
 <body>
 
-<header>
+<div class="hero">
   <div class="diyas">🪔 ✨ 🪔 ✨ 🪔</div>
   <h1 id="shopName">Thala Crackers</h1>
   <p class="tag">Sivakasi crackers • Home delivery • Best Diwali rates</p>
   <span class="wish">✨ Happy Diwali! ✨</span>
   <div class="callline">Orders on WhatsApp: <a id="waLink" href="#">chat with us</a></div>
-</header>
+</div>
+<div class="trustline">🚚 Free delivery in Tamil Nadu • All-India delivery available • Min order ₹3000</div>
 
 <div class="controls">
-  <div class="row">
-    <input id="search" type="search" placeholder="🔍 Search crackers…" autocomplete="off" />
-    <select id="jump" aria-label="Jump to category"><option value="">Category ▾</option></select>
-  </div>
+  <input id="search" type="search" placeholder="🔍 Search crackers…" autocomplete="off" />
+  <div class="pillnav" id="pillnav"></div>
 </div>
 
 <main id="catalog"><div class="noresults" id="noresults" style="display:none">No crackers match your search.</div></main>
@@ -61,6 +60,8 @@
     </div>
   </div>
 </div>
+
+<div class="divider">🪔 Wishing you a safe and sparkling Diwali 🪔</div>
 
 <footer>
   Thala Crackers • Sivakasi • Made for Diwali 🪔<br>
