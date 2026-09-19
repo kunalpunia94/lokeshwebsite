@@ -813,7 +813,7 @@ document.addEventListener("click", (e)=>{
     closeMenus();
   }
 });
-document.querySelectorAll('.nav-link[href^="#"]').forEach(link=>{
+document.querySelectorAll('.nav-link[href^="#"], #navPriceList').forEach(link=>{
   link.addEventListener("click", ()=> setTimeout(closeMenus, 50));
 });
 
