@@ -9,13 +9,23 @@
    ===================================================================== */
    const WHATSAPP_NUMBER = "919345273268";   // <<< PUT YOUR REAL NUMBER HERE
    const CALL_NUMBER     = "6374439080";     // shown on Contact Us, digits only
-   const INSTAGRAM_URL   = "";               // paste your Instagram profile link
+   const INSTAGRAM_URL   = "https://www.instagram.com/thala_crackers";
    let SHOP_NAME         = "Thala Crackers";
    const MIN_ORDER       = 3000;
 /* ===================================================================== */
 
 /* ---------- Catalog (from your price list — price = Final Rate) ---------- */
 const CATALOG = [
+  ["Combo Packs", [
+    ["270","5K Combo Pack","Free TN delivery",5000],
+    ["271","7.5K Combo Pack","Free TN delivery",7500],
+    ["272","10K Combo Pack","Free TN delivery",10000],
+  ]],
+  ["Gift Boxes", [
+    ["263","18 - Item Gift Box","1 Box",261.25],["264","25 - Item Gift Box","1 Box",400],
+    ["265","36 - Item Gift Box","1 Box",625],["266","40 - Item Gift Box","5 Box",3750],
+    ["267","50 - Item Gift Box","5 Box",4875],["268","60 - Item Gift Box","5 Box",6000],
+  ]],
   ["Sparklers", [
     ["1","7 Cm Electric","10 Box (100 pcs)",91.25],["2","7 Cm Colour","10 Box (100 pcs)",112.5],
     ["3","10 Cm Electric","1 Box (10 pcs)",15.63],["4","10 Cm Colour","1 Box (10 pcs)",20],
@@ -240,7 +250,7 @@ const CATALOG = [
     ["251","Classic 10 in 1","1 Box",143.75],["252","Vip 10 in 1 matches","1 Box",236.25],
   ]],
   ["Guns", [
-    ["253","Gun","1 pcs",40],["254","Men Black (Sonny) 3 varity","1 gun",97],
+    ["253","Gun","1 pcs",50],["254","Men Black (Sonny) 3 varity","1 gun",121.25],
   ]],
   ["Sky King Brand New 2026", [
     ["255","Fun Sticks","1 Box (5 pcs)",350],
@@ -251,16 +261,6 @@ const CATALOG = [
   ]],
   ["Balaji Brand SPL New Fancy", [
     ["262","Super Heroes","1 Box (2 pcs)",1500],
-  ]],
-  ["Gift Boxes", [
-    ["263","18 - Item Gift Box","1 Box",209],["264","25 - Item Gift Box","1 Box",320],
-    ["265","36 - Item Gift Box","1 Box",500],["266","40 - Item Gift Box","5 Box",3000],
-    ["267","50 - Item Gift Box","5 Box",3900],["268","60 - Item Gift Box","5 Box",4800],
-  ]],
-  ["Combo Packs", [
-    ["270","5K Combo Pack","52 items • Free TN delivery",5000],
-    ["271","7.5K Combo Pack","70 items • Free TN delivery",7500],
-    ["272","10K Combo Pack","90 items • Free TN delivery",10000],
   ]],
 ];
 
@@ -281,6 +281,7 @@ function totals(){ let sum=0,count=0; for(const k in cart){ sum += byCode[k].pri
 const catalogEl = document.getElementById("catalog");
 const catListEl = document.getElementById("catList");
 const catGridEl = document.getElementById("catGrid");
+const featuredGridEl = document.getElementById("featuredGrid");
 const productMount = document.getElementById("productMount");
 const browseView = document.getElementById("browseView");
 const productsView = document.getElementById("productsView");
@@ -322,6 +323,7 @@ CATALOG.forEach(([cat,items],ci) => {
     card.innerHTML = `
       <div class="glare"></div>
       <div class="card-inner">
+        ${isCombo ? "" : `<span class="off-chip">UP TO 90% OFF</span>`}
         <div class="tile">${icon}</div>
         <div class="name">${name}</div>
         <div class="sub">${pack}</div>
@@ -335,19 +337,30 @@ CATALOG.forEach(([cat,items],ci) => {
   productMount.appendChild(sec);
   sectionById[secId] = sec;
 
+  const featured = cat === "Combo Packs" || cat === "Gift Boxes";
   const tile = document.createElement("button");
-  tile.type = "button"; tile.className = "cat-tile";
+  tile.type = "button"; tile.className = "cat-tile" + (featured ? " featured" : "");
   tile.dataset.cat = cat.toLowerCase();
   tile.dataset.id = secId;
-  tile.innerHTML = `<span class="ico">${icon}</span><span class="nm">${cat}</span><span class="ct">${items.length} item${items.length===1?"":"s"} →</span>`;
-  tile.onclick = () => openCategory(secId);
-  catGridEl.appendChild(tile);
+  const blurb = cat === "Combo Packs" ? "Free TN delivery →" : cat === "Gift Boxes" ? "Ready-to-gift packs →" : `${items.length} item${items.length===1?"":"s"} →`;
+  tile.innerHTML = `${featured ? `<span class="hot">${cat === "Combo Packs" ? "Best value" : "Popular"}</span>` : ""}<span class="ico">${icon}</span><span class="nm">${cat}</span><span class="ct">${blurb}</span>`;
+  if(featured && featuredGridEl){
+    tile.onclick = () => openCategory(secId, "hero");
+    tile.classList.add("in");
+    featuredGridEl.appendChild(tile);
+    const copy = tile.cloneNode(true);
+    copy.onclick = () => openCategory(secId, "browse");
+    catGridEl.appendChild(copy);
+  } else {
+    tile.onclick = () => openCategory(secId, "browse");
+    catGridEl.appendChild(tile);
+  }
 
   const item = document.createElement("button");
   item.type = "button"; item.className = "cat-item";
   item.textContent = icon+" "+cat;
   item.dataset.cat = cat.toLowerCase();
-  item.onclick = () => openCategory(secId);
+  item.onclick = () => openCategory(secId, currentOpenFrom());
   catListEl.appendChild(item);
 });
 const allItem = document.createElement("button");
@@ -359,6 +372,29 @@ catListEl.prepend(allItem);
 /* ---------- Category / product views ---------- */
 let lastBrowseScrollY = 0;
 let lastOpenedTile = null;
+let lastOpenFrom = "browse";
+
+function currentOpenFrom(){
+  if(document.body.classList.contains("in-category")) return "browse";
+  const shop = document.getElementById("shop");
+  return shop && shop.getBoundingClientRect().top > window.innerHeight * 0.5 ? "hero" : "browse";
+}
+
+function updateBackBtn(){
+  const btn = document.getElementById("backCats");
+  if(!btn) return;
+  btn.textContent = lastOpenFrom === "hero" ? "← Home" : "← All categories";
+}
+
+function goHome(){
+  setCategoryMode(false);
+  browseView.hidden = false;
+  productsView.hidden = true;
+  Object.values(sectionById).forEach(sec=> sec.hidden = true);
+  const q = document.getElementById("productSearch");
+  if(q) q.value = "";
+  scrollInstant(()=> window.scrollTo(0, 0));
+}
 
 function navOffset(){
   const nav = document.querySelector(".navbar");
@@ -387,12 +423,12 @@ function playCardEntrance(sec){
 }
 
 function animateCategoryTiles(){
-  document.querySelectorAll(".cat-tile").forEach((tile,i)=>{
+  document.querySelectorAll(".cat-grid .cat-tile").forEach((tile,i)=>{
     tile.classList.remove("in");
     tile.style.transitionDelay = (Math.min(i, 16) * 45) + "ms";
   });
   requestAnimationFrame(()=>{
-    document.querySelectorAll(".cat-tile").forEach(tile=>{
+    document.querySelectorAll(".cat-grid .cat-tile").forEach(tile=>{
       const r = tile.getBoundingClientRect();
       if(r.top < window.innerHeight && r.bottom > 0) tile.classList.add("in");
     });
@@ -439,11 +475,13 @@ function showBrowse(opts = {}){
   }
 }
 
-function openCategory(secId){
+function openCategory(secId, from){
   const sec = sectionById[secId];
   if(!sec) return;
-  const tile = document.querySelector(`.cat-tile[data-id="${secId}"]`);
-  const wasBrowsing = !browseView.hidden;
+  lastOpenFrom = from || currentOpenFrom();
+  updateBackBtn();
+  const tile = document.querySelector(`.cat-grid .cat-tile[data-id="${secId}"]`) || document.querySelector(`.cat-tile[data-id="${secId}"]`);
+  const wasBrowsing = !browseView.hidden && lastOpenFrom === "browse";
   if(wasBrowsing){
     lastBrowseScrollY = window.scrollY;
     lastOpenedTile = tile;
@@ -634,7 +672,7 @@ const noresults = document.getElementById("noresults");
 search.addEventListener("input", ()=>{
   const q = search.value.trim().toLowerCase();
   let any = false;
-  catGridEl.querySelectorAll(".cat-tile").forEach(tile=>{
+  document.querySelectorAll(".cat-tile").forEach(tile=>{
     const match = !q || tile.dataset.cat.includes(q) || tile.textContent.toLowerCase().includes(q);
     tile.style.display = match ? "" : "none";
     if(match) any = true;
@@ -814,7 +852,8 @@ function spawnSparks(id, count){
 /* ---------- Init ---------- */
 const shopNameEl = document.getElementById("shopName");
 if(shopNameEl && shopNameEl.textContent.trim()) SHOP_NAME = shopNameEl.textContent.trim();
-document.getElementById("navBrand").textContent = SHOP_NAME;
+const navBrandText = document.getElementById("navBrandText");
+if(navBrandText) navBrandText.textContent = SHOP_NAME;
 splitTitle(shopNameEl);
 spawnSparks("sparks", 22);
 spawnSparks("shopSparks", 18);
@@ -825,6 +864,46 @@ const waUrl = `https://wa.me/${WHATSAPP_NUMBER}`;
   if(el) el.href = waUrl;
 });
 document.getElementById("contactCall").href = "tel:+91" + CALL_NUMBER.replace(/\D/g,"");
+const waDigits = WHATSAPP_NUMBER.replace(/\D/g,"").replace(/^91/,"");
+const contactCallWa = document.getElementById("contactCallWa");
+if(contactCallWa){
+  contactCallWa.href = "tel:+91" + waDigits;
+  contactCallWa.textContent = "+91 " + waDigits.replace(/(\d{5})(\d{5})/, "$1 $2");
+}
+
+const notice = document.getElementById("legalNotice");
+const enterBtn = document.getElementById("enterSite");
+try{ sessionStorage.removeItem("thala_notice_ok"); }catch(e){}
+
+function blockBgScroll(e){
+  if(!document.body.classList.contains("notice-lock")) return;
+  if(e.target.closest && e.target.closest(".legal-card")) return;
+  e.preventDefault();
+}
+
+function showLegalNotice(){
+  history.replaceState(null, "", location.pathname + location.search);
+  setCategoryMode(false);
+  browseView.hidden = false;
+  productsView.hidden = true;
+  Object.values(sectionById).forEach(sec=> sec.hidden = true);
+  window.scrollTo(0, 0);
+  document.documentElement.classList.add("notice-lock");
+  document.body.classList.add("notice-lock");
+  if(notice) notice.hidden = false;
+}
+
+function hideLegalNotice(){
+  if(notice) notice.hidden = true;
+  document.documentElement.classList.remove("notice-lock");
+  document.body.classList.remove("notice-lock");
+  window.scrollTo(0, 0);
+}
+
+window.addEventListener("wheel", blockBgScroll, {passive:false});
+window.addEventListener("touchmove", blockBgScroll, {passive:false});
+showLegalNotice();
+if(enterBtn) enterBtn.onclick = hideLegalNotice;
 
 const ig = INSTAGRAM_URL.trim();
 ["navIg","contactIg"].forEach(id=>{
@@ -836,10 +915,13 @@ const ig = INSTAGRAM_URL.trim();
   el.tabIndex = -1;
 });
 
-document.getElementById("backCats").onclick = ()=> showBrowse({restore:true, scrollToShop:true});
+document.getElementById("backCats").onclick = ()=>{
+  if(lastOpenFrom === "hero") goHome();
+  else showBrowse({restore:true, scrollToShop:true});
+};
 document.getElementById("navCombos").addEventListener("click", (e)=>{
   e.preventDefault();
-  openCategory("combos");
+  openCategory("combos", currentOpenFrom());
 });
 document.getElementById("browseCta").addEventListener("click", ()=>{
   showBrowse();
