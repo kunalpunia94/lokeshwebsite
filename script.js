@@ -17,14 +17,14 @@
 /* ---------- Catalog (from your price list — price = Final Rate) ---------- */
 const CATALOG = [
   ["Combo Packs", [
-    ["270","5K Combo Pack","Free TN delivery",5000],
-    ["271","7.5K Combo Pack","Free TN delivery",7500],
+    ["270","5K Combo Pack","No free delivery",3999],
+    ["271","7.5K Combo Pack","Free TN delivery",6499],
     ["272","10K Combo Pack","Free TN delivery",10000],
   ]],
   ["Gift Boxes", [
     ["263","18 - Item Gift Box","1 Box",261.25],["264","25 - Item Gift Box","1 Box",400],
-    ["265","36 - Item Gift Box","1 Box",625],["266","40 - Item Gift Box","5 Box",3750],
-    ["267","50 - Item Gift Box","5 Box",4875],["268","60 - Item Gift Box","5 Box",6000],
+    ["265","36 - Item Gift Box","1 Box",625],["266","40 - Item Gift Box","1 Box",750],
+    ["267","50 - Item Gift Box","1 Box",975],["268","60 - Item Gift Box","1 Box",1200],
   ]],
   ["Sparklers", [
     ["1","7 Cm Electric","10 Box (100 pcs)",91.25],["2","7 Cm Colour","10 Box (100 pcs)",112.5],
@@ -315,18 +315,18 @@ CATALOG.forEach(([cat,items],ci) => {
   const gridEl = sec.querySelector(".grid");
   items.forEach((it, idx) => {
     const [code,name,pack,price] = it;
+    const comboMrp = { "270": 5000, "271": 7500 }[code];
     const isCombo = cat === "Combo Packs";
-    const mrp = isCombo ? null : Math.round(price * 4 * 100) / 100;
+    const mrp = comboMrp || (isCombo ? null : Math.round(price * 4 * 100) / 100);
     const card = document.createElement("div");
     card.className = "card reveal-card"; card.dataset.code = code; card.dataset.search = (name+" "+cat).toLowerCase();
     card.style.transitionDelay = (Math.min(idx, 12) * 55) + "ms";
     card.innerHTML = `
       <div class="glare"></div>
       <div class="card-inner">
-        ${isCombo ? "" : `<span class="off-chip">UP TO 90% OFF</span>`}
         <div class="tile">${icon}</div>
         <div class="name">${name}</div>
-        <div class="sub">${pack}</div>
+        ${pack ? `<div class="sub">${pack}</div>` : ""}
         <div class="pricerow">${mrp ? `<span class="mrp">${rupee(mrp)}</span>` : ""}<span class="price">${rupee(price)}</span></div>
         <div class="ctrl"></div>
       </div>`;
