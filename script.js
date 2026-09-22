@@ -17,8 +17,8 @@
 /* ---------- Catalog (from your price list — price = Final Rate) ---------- */
 const CATALOG = [
   ["Combo Packs", [
-    ["270","5K Combo Pack","No free delivery",3999],
-    ["271","7.5K Combo Pack","Free TN delivery",6499],
+    ["270","4K Combo Pack","No free delivery",3999],
+    ["271","6.5K Combo Pack","Free TN delivery",6499],
     ["272","10K Combo Pack","Free TN delivery",10000],
   ]],
   ["Gift Boxes", [
@@ -315,9 +315,8 @@ CATALOG.forEach(([cat,items],ci) => {
   const gridEl = sec.querySelector(".grid");
   items.forEach((it, idx) => {
     const [code,name,pack,price] = it;
-    const comboMrp = { "270": 5000, "271": 7500 }[code];
     const isCombo = cat === "Combo Packs";
-    const mrp = comboMrp || (isCombo ? null : Math.round(price * 4 * 100) / 100);
+    const mrp = isCombo ? null : Math.round(price * 4 * 100) / 100;
     const card = document.createElement("div");
     card.className = "card reveal-card"; card.dataset.code = code; card.dataset.search = (name+" "+cat).toLowerCase();
     card.style.transitionDelay = (Math.min(idx, 12) * 55) + "ms";
