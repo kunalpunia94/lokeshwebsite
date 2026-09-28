@@ -232,13 +232,15 @@ body.notice-lock > :not(.legal-notice){filter:blur(8px);pointer-events:none}
           <textarea id="fAddr" placeholder="House no, street, area, city, pincode"></textarea>
         </div>
         <div class="err" id="formErr"></div>
-        <button class="btn-primary place" id="placeBtn">Place Order on WhatsApp</button>
-        <div class="hint">Tapping this opens WhatsApp with your full order ready — just press <b>send</b> and we'll confirm delivery &amp; payment.</div>
+        <button class="btn-primary place" id="placeBtn">Send order PDF on WhatsApp</button>
+        <div class="hint">This downloads an estimate PDF (only the crackers you picked) and opens WhatsApp. On your phone, attach that PDF in the chat and press <b>send</b>.</div>
       </div>
     </div>
   </div>
 </div>
 
-<script src="script.js?v=16"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<script src="script.js?v=17"></script>
 </body>
 </html>

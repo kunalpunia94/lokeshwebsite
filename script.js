@@ -18,8 +18,8 @@
 const CATALOG = [
   ["Combo Packs", [
     ["270","4K Combo Pack","No free delivery",3999],
-    ["271","6K Combo Pack","No free delivery",6499],
-    ["272","10K Combo Pack","Free TN delivery",10000],
+    ["271","6K Combo Pack","No free delivery",5999],
+    ["272","10K Combo Pack","Free TN delivery",9999],
   ]],
   ["Gift Boxes", [
     ["263","18 - Item Gift Box","1 Box",261.25],["264","25 - Item Gift Box","1 Box",400],
@@ -702,65 +702,124 @@ productSearch.addEventListener("input", ()=>{
   });
 });
 
-/* ---------- Place order (WhatsApp text message) ---------- */
-function buildOrderMessage(name, mobile, email, addr){
-  const byCat = {};
-  for(const code in cart){
-    const it = byCode[code];
-    (byCat[it.cat] ||= []).push([it, cart[code]]);
-  }
-  const {sum,count} = totals();
-  const dated = new Date().toLocaleDateString("en-IN", {day:"numeric", month:"short", year:"numeric"});
-  const itemWord = count === 1 ? "item" : "items";
-
-  let msg = `🪔 *${SHOP_NAME.toUpperCase()}*\n`;
-  msg += `_Happy Diwali • Sivakasi_\n\n`;
-  msg += `> 📅 ${dated}\n\n`;
-
-  Object.keys(byCat).forEach(cat=>{
-    const icon = CATEGORY_ICONS[cat] || "🎆";
-    msg += `*${icon} ${cat}*\n`;
-    byCat[cat].forEach(([it,q])=>{
-      msg += `- ${it.name}  × ${q}  —  *${rupee(it.price*q)}*\n`;
-    });
-    msg += `\n`;
-  });
-
-  msg += `*Amount payable*\n`;
-  msg += `> 💰 *${rupee(sum)}*\n`;
-  msg += `> ${count} ${itemWord}\n\n`;
-
-  msg += `*Deliver to*\n`;
-  msg += `> 👤 ${name}\n`;
-  msg += `> 📱 ${mobile}\n`;
-  msg += `> ✉️ ${email}\n`;
-  msg += `> 📍 ${addr}`;
-  return msg;
+/* ---------- Place order (estimate PDF + WhatsApp) ---------- */
+function rupeePlain(n){
+  const v = Number(n);
+  return Number.isInteger(v) || Math.abs(v - Math.round(v)) < 0.005
+    ? Math.round(v).toLocaleString("en-IN")
+    : v.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-document.getElementById("placeBtn").onclick = ()=>{
-  const name = document.getElementById("fName").value.trim();
-  const mobile = document.getElementById("fMobile").value.trim();
-  const email = document.getElementById("fEmail").value.trim();
-  const addr = document.getElementById("fAddr").value.trim();
-  const err = document.getElementById("formErr");
-
-  if(!name){ err.textContent="Please enter your name."; return; }
-  if(mobile.replace(/\D/g,"").length < 10){ err.textContent="Please enter a valid 10-digit mobile number."; return; }
-  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ err.textContent="Please enter a valid email."; return; }
-  if(!addr){ err.textContent="Please enter your delivery address."; return; }
-  err.textContent = "";
-
-  const msg = buildOrderMessage(name, mobile, email, addr);
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-
-  const isDesktop = window.innerWidth > 768;
-  if(isDesktop){
-    window.open(url, "_blank", "noopener");
-  } else {
-    window.location.href = url;
+function cartLines(){
+  const lines = [];
+  for(const code in cart){
+    const q = cart[code];
+    if(q > 0 && byCode[code]) lines.push({ it: byCode[code], q });
   }
+  return lines;
+}
 
+function buildOrderPdf(name, mobile){
+  const JsPDF = window.jspdf && window.jspdf.jsPDF;
+  if(!JsPDF) return null;
+  const doc = new JsPDF({ unit: "mm", format: "a4" });
+  const { sum, count } = totals();
+  const dated = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const enq = "TC" + Date.now().toString().slice(-8);
+  const pageW = doc.internal.pageSize.getWidth();
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.text(`Enquiry No : ${enq}`, 12, 12);
+  doc.text("ESTIMATE", pageW / 2, 12, { align: "center" });
+  doc.text(`Date : ${dated}`, pageW - 12, 12, { align: "right" });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.text(`Mobile : ${CALL_NUMBER}`, 12, 18);
+  doc.text("WhatsApp : 9345273268", pageW - 12, 18, { align: "right" });
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text(SHOP_NAME.toUpperCase(), pageW / 2, 26, { align: "center" });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text("Sivakasi, Tamil Nadu", pageW / 2, 31, { align: "center" });
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.text("Customer Details", 12, 40);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Name : ${name}`, 12, 46);
+  doc.text(`Phone : ${mobile}`, 12, 51);
+
+  const body = cartLines().map(({ it, q }, i) => {
+    const isCombo = it.cat === "Combo Packs";
+    const mrp = isCombo ? it.price : Math.round(it.price * 4 * 100) / 100;
+    const disc = isCombo ? 0 : Math.round((mrp - it.price) * 100) / 100;
+    return [
+      String(i + 1),
+      it.code,
+      it.name,
+      String(q),
+      rupeePlain(mrp),
+      rupeePlain(disc),
+      rupeePlain(it.price),
+      rupeePlain(it.price * q),
+    ];
+  });
+
+  doc.autoTable({
+    startY: 56,
+    head: [["S.No", "Code", "Product Name", "Qty", "Rate / Qty", "Discount", "Final Rate", "Amount"]],
+    body,
+    theme: "grid",
+    styles: { fontSize: 7.2, cellPadding: 1.4, halign: "center", valign: "middle" },
+    headStyles: { fillColor: [107, 18, 31], textColor: 255, fontStyle: "bold" },
+    columnStyles: {
+      0: { cellWidth: 11 },
+      1: { cellWidth: 15 },
+      2: { cellWidth: 56, halign: "left" },
+      3: { cellWidth: 11 },
+      4: { cellWidth: 22, halign: "right" },
+      5: { cellWidth: 20, halign: "right" },
+      6: { cellWidth: 22, halign: "right" },
+      7: { cellWidth: 22, halign: "right" },
+    },
+    margin: { left: 12, right: 12 },
+  });
+
+  const y = (doc.lastAutoTable && doc.lastAutoTable.finalY ? doc.lastAutoTable.finalY : 56) + 8;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text(`Total items : ${count}`, 12, y);
+  doc.text(`Amount payable : Rs. ${rupeePlain(sum)}`, pageW - 12, y, { align: "right" });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.text("This estimate lists only the crackers you selected. Confirm on WhatsApp for delivery and payment.", 12, y + 8);
+
+  const safe = name.replace(/[^\w]+/g, "_").replace(/^_|_$/g, "") || "customer";
+  const filename = `${safe}_order.pdf`;
+  return { doc, filename, blob: doc.output("blob") };
+}
+
+function downloadBlob(blob, filename){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=> URL.revokeObjectURL(a.href), 2000);
+}
+
+function openWhatsApp(text){
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  if(window.innerWidth > 768) window.open(url, "_blank", "noopener");
+  else window.location.href = url;
+}
+
+function finishOrder(){
   Object.keys(cart).forEach(code=> delete cart[code]);
   saveCart();
   refreshBar();
@@ -771,6 +830,40 @@ document.getElementById("placeBtn").onclick = ()=>{
   document.getElementById("fEmail").value = "";
   document.getElementById("fAddr").value = "";
   window.scrollTo(0,0);
+}
+
+document.getElementById("placeBtn").onclick = async ()=>{
+  const name = document.getElementById("fName").value.trim();
+  const mobile = document.getElementById("fMobile").value.trim();
+  const email = document.getElementById("fEmail").value.trim();
+  const addr = document.getElementById("fAddr").value.trim();
+  const err = document.getElementById("formErr");
+
+  if(!name){ err.textContent="Please enter your name."; return; }
+  if(mobile.replace(/\D/g,"").length < 10){ err.textContent="Please enter a valid 10-digit mobile number."; return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ err.textContent="Please enter a valid email."; return; }
+  if(!addr){ err.textContent="Please enter your delivery address."; return; }
+  if(!cartLines().length){ err.textContent="Add crackers before placing an order."; return; }
+  err.textContent = "";
+
+  const { sum, count } = totals();
+  const pdf = buildOrderPdf(name, mobile);
+  const waText = `🪔 *${SHOP_NAME.toUpperCase()}* order\n👤 ${name}\n📱 ${mobile}\n💰 *${rupee(sum)}*  (${count} item${count===1?"":"s"})\n\nI am sending the estimate PDF. Please confirm delivery.`;
+
+  if(pdf){
+    downloadBlob(pdf.blob, pdf.filename);
+    const file = new File([pdf.blob], pdf.filename, { type: "application/pdf" });
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try{
+        await navigator.share({ files: [file], title: `${SHOP_NAME} estimate`, text: waText });
+        finishOrder();
+        return;
+      }catch(e){ /* user cancelled share — still open WhatsApp */ }
+    }
+  }
+
+  openWhatsApp(waText);
+  finishOrder();
 };
 
 /* ---------- Navbar, hero motion, menus ---------- */
