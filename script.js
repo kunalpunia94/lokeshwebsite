@@ -18,7 +18,7 @@
 const CATALOG = [
   ["Combo Packs", [
     ["270","4K Combo Pack","No free delivery",3999],
-    ["271","6.5K Combo Pack","Free TN delivery",6499],
+    ["271","6K Combo Pack","No free delivery",6499],
     ["272","10K Combo Pack","Free TN delivery",10000],
   ]],
   ["Gift Boxes", [
@@ -277,6 +277,8 @@ function saveCart(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(cart));
 const rupee = n => "₹" + Number(n).toLocaleString("en-IN", {maximumFractionDigits:2});
 const PRODUCT_PHOTO_CODES = new Set("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,54,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,73,80,81,82,88,89,90,91,90-A,92,93,94,96,97,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,119A,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,137,146,147,148,149,150,151,152,153,155,156,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,200-A,200-B,201,202,203,204,205,206,207,208,209,210,211,212,213,214,216,217,218,219,220,221,223,224,225,226,227,228,229,230,231,232,233,230-A,235,236,237,235-a,235-b,238,239,240,241,242,243,244,245,251,252,253,254,255,257,259,260,262".split(","));
 function productPhoto(code, name){
+  const combo = { "270": "4k combo.jpeg", "271": "6k combo.jpeg", "272": "10k combo.jpeg" }[String(code)];
+  if(combo) return "images/" + encodeURI(combo);
   if(!PRODUCT_PHOTO_CODES.has(String(code))) return "";
   const slug = String(name).replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
   return "images/" + code + "-" + slug + ".webp";
