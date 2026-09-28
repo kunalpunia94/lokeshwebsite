@@ -527,10 +527,19 @@ main{padding:22px 12px 140px;max-width:1080px;margin:0 auto}
   .card.reveal-visible:hover .glare{opacity:1}
 }
 .card .tile{
-  height:68px;background:linear-gradient(180deg,#fff7e6,#ffe7b8);
+  height:110px;width:100%;padding:0;border:0;cursor:default;
+  background:linear-gradient(180deg,#fff7e6,#ffe7b8);
   border-radius:12px;margin-bottom:8px;
   display:flex;align-items:center;justify-content:center;font-size:30px;
+  overflow:hidden;position:relative;
 }
+.card .tile.has-photo{cursor:zoom-in}
+.card .tile img{
+  width:100%;height:100%;object-fit:contain;background:#fffaf0;
+  display:block;position:relative;z-index:1;
+}
+.card .tile.has-photo .tile-fallback{display:none}
+.card .tile .tile-fallback{line-height:1}
 .card .name{font-weight:600;font-size:13.5px;line-height:1.25;min-height:2.4em}
 .card .sub{font-size:11px;color:var(--muted);margin:2px 0 6px}
 .card .pricerow{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;flex-wrap:wrap}
@@ -686,6 +695,25 @@ textarea{resize:vertical;min-height:64px}
 .place{width:100%;margin-top:6px;font-size:16px}
 .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:6px;line-height:1.5}
 .err{color:#c0392b;font-size:13px;text-align:center;min-height:16px}
+
+.photo-pop{
+  position:fixed;inset:0;z-index:220;
+  display:flex;align-items:center;justify-content:center;padding:18px;
+}
+.photo-pop[hidden]{display:none!important}
+.photo-pop-wash{position:absolute;inset:0;background:rgba(20,6,10,.72)}
+.photo-pop-card{
+  position:relative;z-index:1;width:min(520px,100%);
+  background:#fffaf0;border:1px solid var(--card-border);border-radius:20px;
+  padding:18px 16px 14px;text-align:center;
+  box-shadow:0 20px 48px rgba(0,0,0,.35);
+}
+.photo-pop-card img{width:100%;max-height:min(70vh,520px);object-fit:contain;border-radius:12px;background:#fff}
+.photo-pop-card p{margin:10px 0 0;font-family:'Baloo 2',cursive;font-weight:700;color:var(--maroon);font-size:18px}
+.photo-pop-close{
+  position:absolute;top:8px;right:10px;width:36px;height:36px;border:0;border-radius:50%;
+  background:rgba(58,7,19,.08);color:var(--maroon);font-size:24px;line-height:1;cursor:pointer;
+}
 
 footer{text-align:center;color:#6d4a38;font-size:12px;padding:20px 12px 30px;line-height:1.6}
 

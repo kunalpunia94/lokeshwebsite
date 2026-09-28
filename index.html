@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=10" />
+<link rel="stylesheet" href="style.css?v=14" />
 <script>history.replaceState(null,"",location.pathname+location.search);window.scrollTo(0,0);</script>
 <style>
 html.notice-lock,body.notice-lock{overflow:hidden!important;height:100%;overscroll-behavior:none}
@@ -190,6 +190,15 @@ body.notice-lock > :not(.legal-notice){filter:blur(8px);pointer-events:none}
   </div>
 </div>
 
+<div class="photo-pop" id="photoPop" hidden>
+  <div class="photo-pop-wash" data-close-photo></div>
+  <div class="photo-pop-card">
+    <button type="button" class="photo-pop-close" data-close-photo aria-label="Close">×</button>
+    <img id="photoPopImg" alt="" />
+    <p id="photoPopName"></p>
+  </div>
+</div>
+
 <div class="cartbar" id="cartbar">
   <button class="btn-primary" id="openCart">
     <span>🛒 View Order <span class="n" id="barCount">0</span></span>
@@ -230,6 +239,6 @@ body.notice-lock > :not(.legal-notice){filter:blur(8px);pointer-events:none}
   </div>
 </div>
 
-<script src="script.js?v=13"></script>
+<script src="script.js?v=15"></script>
 </body>
 </html>
