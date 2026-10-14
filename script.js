@@ -264,13 +264,20 @@ const CATALOG = [
   ]],
 ];
 
+// Products no longer listed by the supplier. Keep them visible in the catalogue,
+// but do not allow them to be added to an order.
+const OUT_OF_STOCK_CODES = new Set([
+  "67A", "95", "154", "158", "159", "160", "161", "164",
+  "214", "232", "231-b", "244"
+]);
+
 /* ---------- State ---------- */
 const cart = {}; // code -> qty
 const byCode = {};
 CATALOG.forEach(([cat,items]) => items.forEach(it => byCode[it[0]] = {code:it[0],name:it[1],pack:it[2],price:it[3],cat}));
 
 const STORE_KEY = "thala_cart_v1";
-function loadCart(){ try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)||"{}"); Object.keys(s).forEach(k=>{ if(byCode[k]&&s[k]>0) cart[k]=s[k]; }); }catch(e){} }
+function loadCart(){ try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)||"{}"); Object.keys(s).forEach(k=>{ if(byCode[k]&&!OUT_OF_STOCK_CODES.has(k)&&s[k]>0) cart[k]=s[k]; }); }catch(e){} }
 function saveCart(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(cart)); }catch(e){} }
 
 /* ---------- Helpers ---------- */
@@ -579,6 +586,10 @@ function attachTilt(card){
 function makeControl(code){
   const wrap = document.createElement("div");
   function draw(){
+    if(OUT_OF_STOCK_CODES.has(String(code))){
+      wrap.innerHTML = `<span class="out-of-stock" aria-label="Out of stock">Out of stock</span>`;
+      return;
+    }
     const q = cart[code]||0;
     if(q>0){
       wrap.innerHTML = `<div class="stepper">

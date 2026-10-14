@@ -561,6 +561,11 @@ main{padding:22px 12px 140px;max-width:1080px;margin:0 auto}
 }
 .add:active{filter:brightness(.96);transform:scale(.98)}
 @media (hover:hover){ .add:hover{filter:brightness(1.04)} }
+.out-of-stock{
+  display:block;margin-top:auto;padding:8px 10px;border:1px solid #d5c9b8;
+  border-radius:10px;background:#f3eee5;color:#8a7c6c;text-align:center;
+  font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;
+}
 
 .noresults{text-align:center;color:#6d4a38;padding:40px 10px}
 
