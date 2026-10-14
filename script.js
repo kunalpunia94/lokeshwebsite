@@ -43,7 +43,7 @@ const CATALOG = [
   ]],
   ["Flower Pots", [
     ["22","Flower Pots Big","1 Box (10 pcs)",73.75],["23","Flower Pots Special","1 Box (10 pcs)",93.75],
-    ["24","Flower Pots Asoka","1 Box (10 pcs)",123.75],["25","Colour Koti","1 Box (10 pcs)",200],
+    ["25","Colour Koti","1 Box (10 pcs)",200],
     ["26","Colour Koti XL","1 Box (10 pcs)",218.75],["27","Colour Koti DLX","1 Box (10 pcs)",306.25],
     ["28","Flower Pot DLX","1 Box (5 pcs)",162.5],
   ]],
@@ -81,7 +81,6 @@ const CATALOG = [
   ]],
   ["Bijili Crackers", [
     ["66","Red Bijili","1 Bag (100 pcs)",33.75],["67","Vari Bijili","1 Bag (100 pcs)",35],
-    ["67A","Stripped Bijili","1 Bag",62.5],
   ]],
   ["Bombs", [
     ["68","King of King","1 Box (10 pcs)",108.75],["69","Classic Bomb","1 Box (10 pcs)",126.25],
@@ -104,8 +103,8 @@ const CATALOG = [
     ["90-A","Scissors 4 variety","1 Box (2 pcs)",748.75],
   ]],
   ["Moorthy Brand SPL Setout Display", [
-    ["92","Imperial Blue 2\" 12","1 Box",1562.5],["93","Jack Daniels 2\" 12 spl crackling","1 Box",1553.75],
-    ["94","Officer's Choice 2\" 40 spl crackling","1 Box",5581.25],["95","Captain Morgan 3 1/2 20 spl crackling","1 Box",5988.75],
+    ["92","Imperial Blue 2\" 12","1 Box",1562.5],
+    ["94","Officer's Choice 2\" 40 spl crackling","1 Box",5581.25],
   ]],
   ["Liya Brand SPL IPL New Fancy", [
     ["96","10 X 10 Multi colour shot 2023 spl","1 Box",3712.5],["97","5 X 10 Multi colour + crackling 2026 spl","1 Box",2111.25],
@@ -166,11 +165,8 @@ const CATALOG = [
     ["152","Chip Combo mix","1 Box (2 pcs)",668.75],["153","Colour Cone","1 Box (10 pcs)",596.25],
   ]],
   ["Mini Arial Fancy", [
-    ["154","1.25 Chotta Fancy","1 Box (1 pcs)",33.75],["155","1 UP Skyking brand","1 Box (5 pcs)",161.25],
-    ["156","2 UP & 1 UP Sky King brand","1 Box (5 pcs)",161.25],["158","Gold Coin Skyking brand","1 Box (5 pcs)",176.25],
-    ["159","White House Sky King brand","1 Box (5 pcs)",176.25],["160","Star World Sky King brand","1 Box (5 pcs)",176.25],
-    ["161","Sun Rise Sky King brand","1 Box (5 pcs)",176.25],["162","Pentagon shot 5 colour mix","1 Box (5 pcs)",211.25],
-    ["163","White House spl crackling","1 Box (5 pcs)",211.25],["164","Blue Moon","1 Box (5 pcs)",137.5],
+    ["155","1 UP Skyking brand","1 Box (5 pcs)",161.25],["156","2 UP & 1 UP Sky King brand","1 Box (5 pcs)",161.25],
+    ["162","Pentagon shot 5 colour mix","1 Box (5 pcs)",211.25],["163","White House spl crackling","1 Box (5 pcs)",211.25],
     ["165","Golden Sun","1 Box (5 pcs)",137.5],
   ]],
   ["Twin Colour Crackling Fountain (Vimal)", [
@@ -183,7 +179,7 @@ const CATALOG = [
   ]],
   ["Vadivel Product 2026 (New)", [
     ["174","Pop Eye","1 Box (5 pcs)",148.75],["175","Scoopy-Doo","1 Box (5 pcs)",148.75],
-    ["176","Dexter","1 Box (5 pcs)",148.75],
+    ["176","Dexter","1 Box (5 pcs)",148.75],["177","Seeti mar whizzling 30 shot mini","1 Box",135.45],
   ]],
   ["Sri Vijay Brand Fancy", [
     ["178","5 inc Salsa series fancy (7 varitys)","1 Box (2 pcs)",1118.75],["179","Bink Spot shot series fancy (5 verity)","1 Box (2 pcs)",1312.5],
@@ -219,7 +215,7 @@ const CATALOG = [
     ["212","Jegajal Bada dlx","1 Box (20 pcs)",448.75],["213","EMU Egg 2024 spl","1 Box (2 pcs)",280],
   ]],
   ["Fancy Functions — Collection Sky King", [
-    ["214","Mayur Father","1 Box (5 pcs)",116.25],["216","Pogo 5 colour","1 Box (5 pcs)",162.5],
+    ["214","Disco Shower","1 Box (5 pcs)",71.4],["216","Pogo 5 colour","1 Box (5 pcs)",162.5],
     ["217","Red Sun","1 Box (5 pcs)",181.25],["218","Green Garden","1 Box (5 pcs)",181.25],
     ["219","Miss Butterfly","1 Box (5 pcs)",181.25],["220","Gold Fest","1 Box (5 pcs)",181.25],
     ["221","Blue Ice","1 Box (5 pcs)",181.25],
@@ -230,10 +226,9 @@ const CATALOG = [
     ["226","Electric Stone","10 Box (100 pcs)",83.75],["227","Jee Boom Baa","10 Box (100 pcs)",71.25],
     ["228","Dancing Butterfly","1 Box (10 pcs)",83.75],["229","Snack Tablet","10 Box (100 pcs)",30],
     ["230","Siren (5 pcs)","1 Box (5 pcs)",146.25],["231","Spinner / Bambaram","1 Box (10 pcs)",106.25],
-    ["232","Photo Flash","1 Box (5 pcs)",83.75],["233","Rainbow Colour Smoke","1 Box (3 pcs)",187.5],
+    ["233","Rainbow Colour Smoke","1 Box (3 pcs)",187.5],
     ["234","Roll Cap","1 Box (10 pcs)",68.75],["230-A","7-Shot","1 Box (5 pcs)",83.75],
     ["230-b","Trafic Master","1 Box (3 pcs)",168.75],["231-A","Selfi Stick","1 Box (5 pcs)",168.75],
-    ["231-b","Drone","1 Box (5 pcs)",170],
   ]],
   ["2026 New Children's Novelties", [
     ["235","Kulfi","1 Box",295],["236","Smooke Bomb Cylinder","1 Box (2 pcs)",252.5],
@@ -244,7 +239,11 @@ const CATALOG = [
     ["238","Mini Feather Peacock","1 Box",146.25],["239","Peacock White","1 Box",200],
     ["240","Peacock Gold","1 Box",200],["241","Peacock Green","1 Box",200],
     ["242","Peacock Red & Green","1 Box",200],["243","Bingo Peacock (5 varity)","1 Box",162.5],
-    ["244","Bada Peacock","1 Box",498.75],["245","Sindoor 2026 (4 varity) Peacock series","1 Box",387.5],
+    ["245","Sindoor 2026 (4 varity) Peacock series","1 Box",387.5],
+  ]],
+  ["Tin Fountain Sky King", [
+    ["246","Sprite","1 Box",115.5],["247","Frooti","1 Box",115.5],["248","Fizz","1 Box",115.5],
+    ["249","Pepsi","1 Box",115.5],["250","Fanta","1 Box",115.5],
   ]],
   ["Mega Match Boxes", [
     ["251","Classic 10 in 1","1 Box",143.75],["252","Vip 10 in 1 matches","1 Box",236.25],
@@ -257,19 +256,9 @@ const CATALOG = [
   ]],
   ["Paper Bomb", [
     ["257","Mani paper / millionare","1 Box (2 pcs)",225],["259","250 kgm Paper Bomb","1 Box",52.5],
-    ["260","500 kgm Paper Bomb","1 Box",105],
-  ]],
-  ["Balaji Brand SPL New Fancy", [
-    ["262","Super Heroes","1 Box (2 pcs)",1500],
+    ["260","500 kgm Paper Bomb","1 Box",105],["261","1kg Paper bomb","1 Box",176.4],
   ]],
 ];
-
-// Products no longer listed by the supplier. Keep them visible in the catalogue,
-// but do not allow them to be added to an order.
-const OUT_OF_STOCK_CODES = new Set([
-  "67A", "95", "154", "158", "159", "160", "161", "164",
-  "214", "232", "231-b", "244"
-]);
 
 /* ---------- State ---------- */
 const cart = {}; // code -> qty
@@ -277,12 +266,12 @@ const byCode = {};
 CATALOG.forEach(([cat,items]) => items.forEach(it => byCode[it[0]] = {code:it[0],name:it[1],pack:it[2],price:it[3],cat}));
 
 const STORE_KEY = "thala_cart_v1";
-function loadCart(){ try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)||"{}"); Object.keys(s).forEach(k=>{ if(byCode[k]&&!OUT_OF_STOCK_CODES.has(k)&&s[k]>0) cart[k]=s[k]; }); }catch(e){} }
+function loadCart(){ try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)||"{}"); Object.keys(s).forEach(k=>{ if(byCode[k]&&s[k]>0) cart[k]=s[k]; }); }catch(e){} }
 function saveCart(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(cart)); }catch(e){} }
 
 /* ---------- Helpers ---------- */
 const rupee = n => "₹" + Number(n).toLocaleString("en-IN", {maximumFractionDigits:2});
-const PRODUCT_PHOTO_CODES = new Set("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,54,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,73,80,81,82,88,89,90,91,90-A,92,93,94,96,97,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,119A,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,137,146,147,148,149,150,151,152,153,155,156,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,200-A,200-B,201,202,203,204,205,206,207,208,209,210,211,212,213,214,216,217,218,219,220,221,223,224,225,226,227,228,229,230,231,232,233,230-A,235,236,237,235-a,235-b,238,239,240,241,242,243,244,245,251,252,253,254,255,257,259,260,262".split(","));
+const PRODUCT_PHOTO_CODES = new Set("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,54,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,73,80,81,82,88,89,90,91,90-A,92,94,96,97,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,119A,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,137,146,147,148,149,150,151,152,153,155,156,162,163,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,200-A,200-B,201,202,203,204,205,206,207,208,209,210,211,212,213,214,216,217,218,219,220,221,223,224,225,226,227,228,229,230,231,233,230-A,230-b,231-A,235,236,237,235-a,235-b,238,239,240,241,242,243,245,246,247,248,249,250,251,252,253,254,255,257,259,260,261".split(","));
 function productPhoto(code, name){
   const combo = { "270": "4k combo.jpeg", "271": "6k combo.jpeg", "272": "10k combo.jpeg" }[String(code)];
   if(combo) return "images/" + encodeURI(combo);
@@ -520,6 +509,22 @@ function openCategory(secId, from){
   closeMenus();
 }
 
+function openProductSearch(query){
+  const needle = String(query || "").trim().toLowerCase();
+  if(!needle) return false;
+  const match = [...productMount.querySelectorAll(".card")].find(card => card.dataset.search.includes(needle));
+  if(!match) return false;
+  const section = match.closest(".cat");
+  openCategory(section.id, "browse");
+  requestAnimationFrame(()=>{
+    match.scrollIntoView({behavior:"smooth", block:"center"});
+    match.classList.add("reveal-visible");
+    match.tabIndex = -1;
+    match.focus({preventScroll:true});
+  });
+  return true;
+}
+
 /* ---------- Scroll reveal (page sections + category tiles) ---------- */
 function revealIfInViewport(el){
   const r = el.getBoundingClientRect();
@@ -586,10 +591,6 @@ function attachTilt(card){
 function makeControl(code){
   const wrap = document.createElement("div");
   function draw(){
-    if(OUT_OF_STOCK_CODES.has(String(code))){
-      wrap.innerHTML = `<span class="out-of-stock" aria-label="Out of stock">Out of stock</span>`;
-      return;
-    }
     const q = cart[code]||0;
     if(q>0){
       wrap.innerHTML = `<div class="stepper">
@@ -702,6 +703,20 @@ search.addEventListener("input", ()=>{
   });
   noresults.style.display = any ? "none" : "block";
 });
+const productFinder = document.getElementById("productFinder");
+const productFinderMessage = document.getElementById("productFinderMessage");
+function submitProductFinder(){
+  const query = productFinder.value.trim();
+  if(!query){ productFinderMessage.textContent = ""; return; }
+  if(openProductSearch(query)){
+    productFinderMessage.textContent = "";
+    productFinder.value = "";
+  } else {
+    productFinderMessage.textContent = "No cracker matches that name.";
+  }
+}
+productFinder.addEventListener("search", submitProductFinder);
+productFinder.addEventListener("keydown", event=>{ if(event.key === "Enter"){ event.preventDefault(); submitProductFinder(); } });
 productSearch.addEventListener("input", ()=>{
   const q = productSearch.value.trim().toLowerCase();
   const sec = [...productMount.querySelectorAll(".cat")].find(s=> !s.hidden);

@@ -178,12 +178,12 @@ button,input,select,textarea{font-family:inherit}
   backdrop-filter:blur(16px);
 }
 .nav-dd-panel[hidden]{display:none}
-#catFilter,#search,#productSearch{
+#catFilter,#search,#productSearch,#productFinder{
   width:100%;border:1px solid rgba(255,244,224,.18);border-radius:12px;
   padding:10px 12px;margin-bottom:8px;background:rgba(255,255,255,.92);
   color:var(--text);outline:none;font-size:15px;
 }
-#search,#productSearch{margin:0;background:rgba(255,255,255,.88)}
+#search,#productSearch,#productFinder{margin:0;background:rgba(255,255,255,.88)}
 .cat-list{max-height:min(360px,50vh);overflow:auto;display:grid;gap:2px}
 .cat-item{
   width:100%;text-align:left;border:0;background:transparent;cursor:pointer;
@@ -421,7 +421,9 @@ main{padding:22px 12px 140px;max-width:1080px;margin:0 auto}
 .browse-kicker{margin:0;letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:#9a4a12}
 .browse-head h2{font-family:'Baloo 2',cursive;font-size:clamp(28px,6vw,42px);margin:4px 0}
 .browse-copy{margin:0 0 14px;color:#6d4a38;font-size:14px}
-.browse-head #search{max-width:420px;margin:0 auto}
+.catalog-searches{display:grid;gap:10px;max-width:420px;margin:0 auto}
+.browse-head #search,.browse-head #productFinder{max-width:420px;margin:0 auto}
+.product-finder-message{min-height:1.3em;margin:0;color:var(--maroon);font-size:12px;font-weight:600}
 .featured-label{
   margin:4px 2px 10px;font-family:'Baloo 2',cursive;font-weight:800;
   color:var(--maroon);font-size:20px;
@@ -561,12 +563,6 @@ main{padding:22px 12px 140px;max-width:1080px;margin:0 auto}
 }
 .add:active{filter:brightness(.96);transform:scale(.98)}
 @media (hover:hover){ .add:hover{filter:brightness(1.04)} }
-.out-of-stock{
-  display:block;margin-top:auto;padding:8px 10px;border:1px solid #d5c9b8;
-  border-radius:10px;background:#f3eee5;color:#8a7c6c;text-align:center;
-  font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;
-}
-
 .noresults{text-align:center;color:#6d4a38;padding:40px 10px}
 
 .divider{
