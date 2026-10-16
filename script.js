@@ -286,7 +286,7 @@ const catalogEl = document.getElementById("catalog");
 const catListEl = document.getElementById("catList");
 const catGridEl = document.getElementById("catGrid");
 const featuredGridEl = document.getElementById("featuredGrid");
-const productMount = document.getElementById("productMount");
+const productMount = document.getElementById("allProductsMount");
 const browseView = document.getElementById("browseView");
 const productsView = document.getElementById("productsView");
 const controls = {};
@@ -314,7 +314,7 @@ CATALOG.forEach(([cat,items],ci) => {
   const icon = CATEGORY_ICONS[cat] || "🎆";
   const sec = document.createElement("section");
   sec.className = "cat"; sec.id = secId; sec.dataset.cat = cat.toLowerCase();
-  sec.hidden = true;
+  sec.hidden = false;
   sec.innerHTML = `<h2><span class="title-text">${icon} ${cat}</span> <span class="count">(${items.length})</span></h2><div class="bar"></div><div class="grid"></div>`;
   const gridEl = sec.querySelector(".grid");
   items.forEach((it, idx) => {
@@ -353,14 +353,14 @@ CATALOG.forEach(([cat,items],ci) => {
   const blurb = cat === "Combo Packs" ? "Free TN delivery →" : cat === "Gift Boxes" ? "Ready-to-gift packs →" : `${items.length} item${items.length===1?"":"s"} →`;
   tile.innerHTML = `${featured ? `<span class="hot">${cat === "Combo Packs" ? "Best value" : "Popular"}</span>` : ""}<span class="ico">${icon}</span><span class="nm">${cat}</span><span class="ct">${blurb}</span>`;
   if(featured && featuredGridEl){
-    tile.onclick = () => openCategory(secId, "hero");
+    tile.onclick = () => scrollToCategory(secId);
     tile.classList.add("in");
     featuredGridEl.appendChild(tile);
     const copy = tile.cloneNode(true);
-    copy.onclick = () => openCategory(secId, "browse");
+    copy.onclick = () => scrollToCategory(secId);
     catGridEl.appendChild(copy);
   } else {
-    tile.onclick = () => openCategory(secId, "browse");
+    tile.onclick = () => scrollToCategory(secId);
     catGridEl.appendChild(tile);
   }
 
@@ -368,7 +368,7 @@ CATALOG.forEach(([cat,items],ci) => {
   item.type = "button"; item.className = "cat-item";
   item.textContent = icon+" "+cat;
   item.dataset.cat = cat.toLowerCase();
-  item.onclick = () => openCategory(secId, currentOpenFrom());
+  item.onclick = () => scrollToCategory(secId);
   catListEl.appendChild(item);
 });
 const allItem = document.createElement("button");
@@ -398,7 +398,7 @@ function goHome(){
   setCategoryMode(false);
   browseView.hidden = false;
   productsView.hidden = true;
-  Object.values(sectionById).forEach(sec=> sec.hidden = true);
+  Object.values(sectionById).forEach(sec=> sec.hidden = false);
   const q = document.getElementById("productSearch");
   if(q) q.value = "";
   scrollInstant(()=> window.scrollTo(0, 0));
@@ -456,24 +456,11 @@ function setCategoryMode(on){
 }
 
 function showBrowse(opts = {}){
-  setCategoryMode(false);
+  showBrowseAll();
   const restore = !!opts.restore && lastBrowseScrollY > 0;
-  browseView.hidden = false;
-  productsView.hidden = true;
-  Object.values(sectionById).forEach(sec=> sec.hidden = true);
-  const q = document.getElementById("productSearch");
-  if(q) q.value = "";
   if(restore){
     showTilesReady();
-    scrollInstant(()=>{
-      window.scrollTo(0, lastBrowseScrollY);
-      if(lastOpenedTile){
-        const r = lastOpenedTile.getBoundingClientRect();
-        if(r.bottom < navOffset() || r.top > window.innerHeight){
-          window.scrollTo(0, Math.max(0, window.scrollY + r.top - navOffset()));
-        }
-      }
-    });
+    scrollInstant(()=> window.scrollTo(0, lastBrowseScrollY));
   } else {
     document.querySelectorAll(".cat-tile.was-open").forEach(t=> t.classList.remove("was-open"));
     animateCategoryTiles();
@@ -483,30 +470,31 @@ function showBrowse(opts = {}){
   }
 }
 
-function openCategory(secId, from){
+function showBrowseAll(){
+  setCategoryMode(false);
+  browseView.hidden = false;
+  productsView.hidden = true;
+  Object.values(sectionById).forEach(sec=> sec.hidden = false);
+  revealAllCards();
+  const q = document.getElementById("productSearch");
+  if(q) q.value = "";
+}
+
+function revealAllCards(){
+  productMount.querySelectorAll(".card").forEach(card=> card.classList.add("reveal-visible"));
+}
+
+function scrollToCategory(secId){
   const sec = sectionById[secId];
   if(!sec) return;
-  lastOpenFrom = from || currentOpenFrom();
-  updateBackBtn();
-  const tile = document.querySelector(`.cat-grid .cat-tile[data-id="${secId}"]`) || document.querySelector(`.cat-tile[data-id="${secId}"]`);
-  const wasBrowsing = !browseView.hidden && lastOpenFrom === "browse";
-  if(wasBrowsing){
-    lastBrowseScrollY = window.scrollY;
-    lastOpenedTile = tile;
-  }
-  setCategoryMode(true);
-  browseView.hidden = true;
-  productsView.hidden = false;
-  Object.values(sectionById).forEach(s=> s.hidden = s !== sec);
-  sec.querySelectorAll(".card").forEach(c=> c.style.display = "");
-  if(productSearch) productSearch.value = "";
-  playCardEntrance(sec);
-  const toolbar = document.querySelector(".products-toolbar");
-  scrollInstant(()=>{
-    const delta = toolbar.getBoundingClientRect().top - navOffset();
-    if(Math.abs(delta) > 2) window.scrollBy(0, delta);
-  });
+  showBrowseAll();
   closeMenus();
+  requestAnimationFrame(()=> sec.scrollIntoView({behavior:"smooth", block:"start"}));
+}
+
+function openCategory(secId, from){
+  lastOpenFrom = from || currentOpenFrom();
+  scrollToCategory(secId);
 }
 
 function openProductSearch(query){
@@ -515,7 +503,7 @@ function openProductSearch(query){
   const match = [...productMount.querySelectorAll(".card")].find(card => card.dataset.search.includes(needle));
   if(!match) return false;
   const section = match.closest(".cat");
-  openCategory(section.id, "browse");
+  scrollToCategory(section.id);
   requestAnimationFrame(()=>{
     match.scrollIntoView({behavior:"smooth", block:"center"});
     match.classList.add("reveal-visible");
@@ -1014,10 +1002,7 @@ function blockBgScroll(e){
 
 function showLegalNotice(){
   history.replaceState(null, "", location.pathname + location.search);
-  setCategoryMode(false);
-  browseView.hidden = false;
-  productsView.hidden = true;
-  Object.values(sectionById).forEach(sec=> sec.hidden = true);
+  showBrowseAll();
   window.scrollTo(0, 0);
   document.documentElement.classList.add("notice-lock");
   document.body.classList.add("notice-lock");

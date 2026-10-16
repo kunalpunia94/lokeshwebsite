@@ -118,7 +118,7 @@ body.notice-lock > :not(.legal-notice){filter:blur(8px);pointer-events:none}
         <div class="browse-head reveal">
           <p class="browse-kicker">The collection</p>
           <h2>Pick a category</h2>
-          <p class="browse-copy">Tap a category to see every cracker in it.</p>
+          <p class="browse-copy">Choose a category or scroll below to browse every cracker.</p>
           <div class="catalog-searches">
             <input id="search" type="search" placeholder="Search categories…" autocomplete="off" />
             <input id="productFinder" type="search" placeholder="Search a cracker name…" autocomplete="off" />
@@ -127,6 +127,14 @@ body.notice-lock > :not(.legal-notice){filter:blur(8px);pointer-events:none}
         </div>
         <div class="cat-grid" id="catGrid"></div>
         <div class="noresults" id="noresults" style="display:none">No categories match your search.</div>
+        <section class="all-products" aria-labelledby="allProductsHeading">
+          <div class="all-products-head">
+            <p class="browse-kicker">Browse everything</p>
+            <h2 id="allProductsHeading">All Crackers</h2>
+            <p>Every cracker, grouped by category.</p>
+          </div>
+          <div id="allProductsMount"></div>
+        </section>
       </section>
 
       <section class="products-view" id="productsView" hidden>
@@ -134,7 +142,6 @@ body.notice-lock > :not(.legal-notice){filter:blur(8px);pointer-events:none}
           <button class="back-cats" id="backCats" type="button">← All categories</button>
           <input id="productSearch" type="search" placeholder="Search in this category…" autocomplete="off" />
         </div>
-        <div id="productMount"></div>
       </section>
     </main>
 
