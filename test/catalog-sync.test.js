@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const test = require("node:test");
 const vm = require("node:vm");
+const supplier = require("./fixtures/renuga-2026-10-16.json");
 
 function catalog() {
   const source = fs.readFileSync("script.js", "utf8");
@@ -14,27 +15,38 @@ function products() {
   return catalog().flatMap(([, items]) => items);
 }
 
-test("non-exempt catalogue removes Renuga-missing products", () => {
-  const names = new Set(products().map(([, name]) => name));
-  for (const name of ["Flower Pots Asoka", "Captain Morgan 3 1/2 20 spl crackling", "Mayur Father", "Super Heroes"]) {
-    assert.equal(names.has(name), false, `${name} should not remain in the catalogue`);
+test("non-exempt catalogue exactly matches the newer Renuga snapshot in both directions", () => {
+  const actual = catalog().filter(([cat]) => !["Combo Packs", "Gift Boxes"].includes(cat))
+    .flatMap(([cat, items]) => items.map(([code]) => `${cat}:${code}`)).sort();
+  const expected = supplier.products.map(item => `${item.category}:${item.code}`).sort();
+  assert.deepEqual(Array.from(actual), expected);
+  assert.equal(new Set(products().map(([code]) => code)).size, products().length, "codes must be unique");
+});
+
+test("new and replacement products use supplier selling price plus five percent; retained prices are unchanged", () => {
+  const items = new Map(products().map(item => [item[0], item]));
+  for (const item of supplier.products) {
+    const expected = item.incoming ? Math.round(item.supplierPrice * 105) / 100 : item.expectedPrice;
+    assert.equal(items.get(item.code)?.[3], expected, `${item.name} price`);
   }
 });
 
-test("new Renuga products use a five-percent price uplift and have source images", () => {
-  const items = new Map(products().map(item => [item[1], item]));
-  const expected = new Map([
-    ["Disco Shower", 71.4],
-    ["Seeti mar whizzling 30 shot mini", 135.45],
-    ["Sprite", 115.5],
-    ["1kg Paper bomb", 176.4]
-  ]);
-  for (const [name, price] of expected) assert.equal(items.get(name)?.[3], price, `${name} price`);
-  for (const image of [
-    "images/214-Disco-Shower.webp", "images/177-Seeti-mar-whizzling-30-shot-mini.webp",
-    "images/246-Sprite.webp", "images/247-Frooti.webp", "images/248-Fizz.webp",
-    "images/249-Pepsi.webp", "images/250-Fanta.webp", "images/261-1kg-Paper-bomb.webp"
-  ]) assert.equal(fs.existsSync(image), true, `${image} should be present`);
+test("every rendered product image exists and newly downloaded images are valid WebP files", () => {
+  const source = fs.readFileSync("script.js", "utf8");
+  const photo = vm.runInNewContext(source.slice(source.indexOf("const PRODUCT_PHOTO_CODES"), source.indexOf("function totals")) + "; productPhoto");
+  for (const [code, name] of products()) {
+    const path = decodeURI(photo(code, name));
+    if (path) assert.equal(fs.existsSync(path), true, `${name}: ${path}`);
+  }
+  for (const item of supplier.products.filter(item => item.incoming)) {
+    assert.equal(photo(item.code, itemsName(item.code)), item.imagePath || "");
+    if (item.imagePath) {
+      const bytes = fs.readFileSync(item.imagePath);
+      assert.equal(bytes.toString("ascii", 0, 4), "RIFF");
+      assert.equal(bytes.toString("ascii", 8, 12), "WEBP");
+    }
+  }
+  function itemsName(code) { return products().find(item => item[0] === code)[1]; }
 });
 
 test("Combo Packs and Gift Boxes retain their existing products and prices", () => {
