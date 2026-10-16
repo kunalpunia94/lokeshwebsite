@@ -284,7 +284,6 @@ function totals(){ let sum=0,count=0; for(const k in cart){ sum += byCode[k].pri
 /* ---------- Render catalog ---------- */
 const catalogEl = document.getElementById("catalog");
 const catListEl = document.getElementById("catList");
-const catGridEl = document.getElementById("catGrid");
 const featuredGridEl = document.getElementById("featuredGrid");
 const productMount = document.getElementById("allProductsMount");
 const browseView = document.getElementById("browseView");
@@ -356,12 +355,6 @@ CATALOG.forEach(([cat,items],ci) => {
     tile.onclick = () => scrollToCategory(secId);
     tile.classList.add("in");
     featuredGridEl.appendChild(tile);
-    const copy = tile.cloneNode(true);
-    copy.onclick = () => scrollToCategory(secId);
-    catGridEl.appendChild(copy);
-  } else {
-    tile.onclick = () => scrollToCategory(secId);
-    catGridEl.appendChild(tile);
   }
 
   const item = document.createElement("button");
@@ -373,7 +366,7 @@ CATALOG.forEach(([cat,items],ci) => {
 });
 const allItem = document.createElement("button");
 allItem.type = "button"; allItem.className = "cat-item";
-allItem.textContent = "← All categories";
+allItem.textContent = "All crackers";
 allItem.onclick = ()=>{ showBrowse({restore:true, scrollToShop:true}); closeMenus(); };
 catListEl.prepend(allItem);
 
@@ -475,6 +468,8 @@ function showBrowseAll(){
   browseView.hidden = false;
   productsView.hidden = true;
   Object.values(sectionById).forEach(sec=> sec.hidden = false);
+  productFinder.value = "";
+  filterCrackers("");
   revealAllCards();
   const q = document.getElementById("productSearch");
   if(q) q.value = "";
@@ -678,33 +673,31 @@ function renderCart(){
 }
 
 /* ---------- Search ---------- */
-const search = document.getElementById("search");
 const productSearch = document.getElementById("productSearch");
-const noresults = document.getElementById("noresults");
-search.addEventListener("input", ()=>{
-  const q = search.value.trim().toLowerCase();
-  let any = false;
-  document.querySelectorAll(".cat-tile").forEach(tile=>{
-    const match = !q || tile.dataset.cat.includes(q) || tile.textContent.toLowerCase().includes(q);
-    tile.style.display = match ? "" : "none";
-    if(match) any = true;
-  });
-  noresults.style.display = any ? "none" : "block";
-});
 const productFinder = document.getElementById("productFinder");
 const productFinderMessage = document.getElementById("productFinderMessage");
-function submitProductFinder(){
-  const query = productFinder.value.trim();
-  if(!query){ productFinderMessage.textContent = ""; return; }
-  if(openProductSearch(query)){
-    productFinderMessage.textContent = "";
-    productFinder.value = "";
-  } else {
-    productFinderMessage.textContent = "No cracker matches that name.";
-  }
+function filterCrackers(query){
+  const needle = String(query || "").trim().toLowerCase();
+  let count = 0;
+  Object.values(sectionById).forEach(section=>{
+    let visible = 0;
+    section.querySelectorAll(".card").forEach(card=>{
+      const name = byCode[card.dataset.code].name.toLowerCase();
+      const matches = !needle || name.startsWith(needle);
+      card.style.display = matches ? "" : "none";
+      if(matches){
+        visible++;
+        card.classList.add("reveal-visible");
+      }
+    });
+    section.hidden = visible === 0;
+    count += visible;
+  });
+  productFinderMessage.textContent = !needle ? "" : count ? `${count} cracker${count === 1 ? "" : "s"} found.` : "No cracker matches that name.";
+  return count;
 }
-productFinder.addEventListener("search", submitProductFinder);
-productFinder.addEventListener("keydown", event=>{ if(event.key === "Enter"){ event.preventDefault(); submitProductFinder(); } });
+productFinder.addEventListener("input", ()=> filterCrackers(productFinder.value));
+productFinder.addEventListener("search", ()=> filterCrackers(productFinder.value));
 productSearch.addEventListener("input", ()=>{
   const q = productSearch.value.trim().toLowerCase();
   const sec = [...productMount.querySelectorAll(".cat")].find(s=> !s.hidden);

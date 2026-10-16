@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=14" />
+<link rel="stylesheet" href="style.css?v=15" />
 <script>history.replaceState(null,"",location.pathname+location.search);window.scrollTo(0,0);</script>
 <style>
 html.notice-lock,body.notice-lock{overflow:hidden!important;height:100%;overscroll-behavior:none}
@@ -117,22 +117,14 @@ body.notice-lock > :not(.legal-notice){filter:blur(8px);pointer-events:none}
       <section class="browse-view" id="browseView">
         <div class="browse-head reveal">
           <p class="browse-kicker">The collection</p>
-          <h2>Pick a category</h2>
-          <p class="browse-copy">Choose a category or scroll below to browse every cracker.</p>
+          <h2 id="allProductsHeading">All Crackers</h2>
+          <p class="browse-copy">Every cracker, grouped by category.</p>
           <div class="catalog-searches">
-            <input id="search" type="search" placeholder="Search categories…" autocomplete="off" />
-            <input id="productFinder" type="search" placeholder="Search a cracker name…" autocomplete="off" />
+            <input id="productFinder" type="search" placeholder="Search a cracker name…" aria-label="Search crackers by name" autocomplete="off" />
             <p class="product-finder-message" id="productFinderMessage" aria-live="polite"></p>
           </div>
         </div>
-        <div class="cat-grid" id="catGrid"></div>
-        <div class="noresults" id="noresults" style="display:none">No categories match your search.</div>
         <section class="all-products" aria-labelledby="allProductsHeading">
-          <div class="all-products-head">
-            <p class="browse-kicker">Browse everything</p>
-            <h2 id="allProductsHeading">All Crackers</h2>
-            <p>Every cracker, grouped by category.</p>
-          </div>
           <div id="allProductsMount"></div>
         </section>
       </section>
@@ -252,6 +244,6 @@ body.notice-lock > :not(.legal-notice){filter:blur(8px);pointer-events:none}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
-<script src="script.js?v=17"></script>
+<script src="script.js?v=18"></script>
 </body>
 </html>
